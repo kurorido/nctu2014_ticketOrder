@@ -1,14 +1,127 @@
+<!DOCTYPE HTML>
 <html>
 <head>
-  <script src="https://cdn.firebase.com/v0/firebase.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+  <script src="js/firebase.js"></script>
+  <script src="js/jquery.min.js"></script>
   <link rel="stylesheet" type="text/css" href="https://www.firebase.com/css/example.css">
+  <script src="js/kinetic-v5.0.1.min.js"></script>
 </head>
 <body>
-    <div>
-      <canvas id="drawing-canvas" width="480" height="420"></canvas>
-  </div>
+    <div id="container"></div>
+    <input type='text' id='nameInput' placeholder='Name'>
+<input type='text' id='messageInput' placeholder='Message...'>
+    <script defer="defer">
+      function writeMessage(message) {
+        text.setText(message);
+        layer.draw();
+      }
+      
+      var stage = new Kinetic.Stage({
+        container: 'container',
+        width: 578,
+        height: 200
+      });
+      
+      var layer = new Kinetic.Layer();
 
+      var text = new Kinetic.Text({
+        x: 10,
+        y: 10,
+        fontFamily: 'Calibri',
+        fontSize: 24,
+        text: '',
+        fill: 'black'
+      });
+
+      var numEvents = 0;
+
+      var circle = new Kinetic.Circle({
+        x: stage.width()/2,
+        y: stage.height()/2 + 10,
+        radius: 70,
+        fill: 'red',
+        stroke: 'black',
+        strokeWidth: 4
+      });
+
+       var rect0 = new Kinetic.Rect({
+        x: 0,
+        y: 0,
+        width: 50,
+        height: 50,
+        fill: 'green',
+        stroke: 'black',
+        strokeWidth: 4
+      });
+
+       var rect1 = new Kinetic.Rect({
+        x: 100,
+        y: 0,
+        width: 50,
+        height: 50,
+        fill: 'green',
+        stroke: 'black',
+        strokeWidth: 4
+      });
+
+       var rect2 = new Kinetic.Rect({
+        x: 200,
+        y: 0,
+        width: 50,
+        height: 50,
+        fill: 'green',
+        stroke: 'black',
+        strokeWidth: 4,
+        name: '2'
+      });
+
+       rect2.on('mousedown touchstart', function() {
+        
+        writeMessage(rect2.Rect);
+      });
+
+      /*
+       * mousedown and touchstart are desktop and
+       * mobile equivalents so they are often times
+       * used together
+       */
+      circle.on('mousedown touchstart', function() {
+        writeMessage('Mousedown or touchstart');
+      });
+      /*
+       * mouseup and touchend are desktop and
+       * mobile equivalents so they are often times
+       * used together
+       */
+      circle.on('mouseup touchend', function() {
+        writeMessage('Mouseup or touchend');
+      });
+
+      layer.add(rect0);
+      layer.add(rect1);
+      layer.add(rect2);
+      layer.add(circle);
+      layer.add(text);
+      stage.add(layer);
+
+      var json = stage.toJSON();
+      var shapes = stage.find('.2');
+      console.log(shapes);
+
+    </script>
+    <script>
+      var messagesRef = new Firebase('https://ticketorder.firebaseio.com/');
+        $('#messageInput').keypress(function (e) {
+    if (e.keyCode == 13) {
+      var name = $('#nameInput').val();
+      var text = $('#messageInput').val();
+      messagesRef.push({name:name, text:text, josn:json});
+      $('#messageInput').val('');
+    }
+  });
+
+    </script>
+<!--
   <script>
   $(document).ready(function () {
     //Set up some globals
@@ -41,5 +154,6 @@
 
 });
   </script>
+-->
 </body>
 </html>
