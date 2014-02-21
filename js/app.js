@@ -87,7 +87,7 @@ function ticketorderController($scope, $firebase) {
 		y: 0,
 		width: 50,
 		height: 50,
-		fill: 'green',
+		fill: 'red',
 		stroke: 'black',
 		strokeWidth: 4,
 		id: 'a1'
@@ -110,9 +110,13 @@ function ticketorderController($scope, $firebase) {
 
 	rect1.on('mouseup touchend', function() {
 		var ref = $firebase(new Firebase("https://ticketorder.firebaseio.com/seat/A1"));
-		$scope.hoods[1].price += 1;
-		ref.$child("price").$set($scope.hoods[1].price);
+		$scope.price += 1;
+		ref.$child("price").$set($scope.price);
 		writeMessage('A1');
+
+		this.fill('blue');
+		layer.draw();
+
 	});
 
 	rect2.on('mousedown touchstart', function() {

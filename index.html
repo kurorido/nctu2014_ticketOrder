@@ -18,7 +18,6 @@
 
     <div ng-repeat="hood in hoods" class="neighborhood animated swing">
       <div class="card" id="{{hood.id}}" ng-class="{'sunny': weather == 'sunny', 'foggy': weather == 'foggy'}" ng-controller="ticketorderController" ng-init="init(hood.value)">
-
         <h3 class="hood">{{hood.value}}</h3>
 
         <div id="weather-count">
