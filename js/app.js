@@ -5,17 +5,17 @@ function ticketorderController($scope, $firebase) {
 		value: 'A0',
 		id: 'A0',
 		price: 0,
-		taken: 0
+		taken: 0,
 	},{
 		value: 'A1',
 		id: 'A1',
 		price: 0,
-		taken: 0
+		taken: 0,
 	},{
 		value: 'A2',
 		id: 'A2',
 		price: 0,
-		taken: 0
+		taken: 0,
 	}];
 
 	$scope.init = function(seat) {
@@ -126,8 +126,8 @@ function ticketorderController($scope, $firebase) {
 	stage.add(layer);
 
 	var json = rect0.toJSON();
-	var shapes = stage.find('a0');
-	console.log(shapes);
+	var shapes = stage.find('#a1')[0];
+	console.log(shapes.attrs.id);
 
 	var messagesRef = new Firebase('https://ticketorder.firebaseio.com/');
 
