@@ -10,23 +10,89 @@
   </head>
   <body>
     <div id="container"></div>
+          <h3>Color Prices Mapping</h3>
+      <ul id="color-mapping-list" style="list-style: none">
+      </ul>
     <script src="http://d3lp1msu2r81bx.cloudfront.net/kjs/js/lib/kinetic-v5.0.1.min.js"></script>
     <script src="https://cdn.firebase.com/v0/firebase.js"></script>
+    <script src="./js/jquery.min.js"></script>
     <script defer="defer">
 
+      var mode = 0;
+      var seatTypeCount = 0;
+      //var modeColor = ["#000","#f00","#0f0","#00f","#88f","#f8d","#f88","#f05","#f80","#0f8","#cf0","#08f","#408","#ff8","#8ff"];
+      var modeName = ["Stage", "Normal", "VIP"];
+
       var stage = null;
+      var layer = new Kinetic.Layer();
+      var idLayer = new Kinetic.Layer();
+
       var json = "";
       var eventRef = new Firebase("https://ticketorder.firebaseio.com/event/1");
-      eventRef.once('value', function(dataSnapshot) {
+        eventRef.once('value', function(dataSnapshot) {
         var eventData = dataSnapshot.val();
         json = eventData.seatMap;
         stage = Kinetic.Node.create(json, 'container');
 
-        
+        idLayer = stage.find("#idLayer")[0];
+        layer = stage.find("#seatLayer")[0];
+
+        stage.add(idLayer);
+        stage.add(layer);
+
+        modeName = eventData.typeList;
+        modeColor = eventData.colorList;
+
+        $("#color-mapping-list").empty();
+
+        seatTypeCount = 0;
+
+        for(var i = 0; i < modeName.length; i++) {
+          addSeatType(true);
+        }
+
+        layer.getChildren().forEach(function (rect) {
+          bindRectEvent(rect);
+        });          
+
+        layer.on("mouseup", function(e) {
+          moving = false;
+        });        
 
       });
 
-      // create node using json string
+      function bindRectEvent(rect) {
+        rect.on('mousedown', function(e) {
+          moving = true;
+          if(this.getAttr('lockedBy') == _currentUserId) { // locked by current user, release it
+
+            return;
+          } else { // not locked by current user
+            if(this.getAttr('lockedBy') != '') { // not locked by any user
+              if(this.getAttr('available') == true) { // seat is available
+                this.setAttr('lockedBy', _currentUserId);
+                this.setAttr('available', false); // mark as not available
+                this.fill('#f00');
+                // update UI
+                layer.draw();
+              }
+            }
+          }
+        });
+      }
+
+      function addSeatType(addFromTemplate) {
+
+        addFromTemplate = addFromTemplate || false;
+
+        if(!addFromTemplate) {
+          $( "#color-mapping-list" ).append( "<li><div style=\"display: inline-block\" onclick=\"changeType("+ (seatTypeCount) + ")\"><div style=\"height:15px; width: 15px; background-color:" + modeColor[seatTypeCount] +"; display: inline-block\"></div><span value="+ seatTypeCount +" style=\"padding-left: 10px;\"><span onclick=\"changeText(this)\">New Ticket Type</span></div></li>" );
+          modeName.push('New Ticket Type');
+        } else {
+           $( "#color-mapping-list" ).append( "<li><div style=\"display: inline-block\" onclick=\"changeType("+ (seatTypeCount) + ")\"><div style=\"height:15px; width: 15px; background-color:" + modeColor[seatTypeCount] +"; display: inline-block\"></div><span value="+ seatTypeCount +" style=\"padding-left: 10px;\"><span onclick=\"changeText(this)\">"+ modeName[seatTypeCount] + "</span></div></li>" );
+        }
+        seatTypeCount++;
+      }      
       
     </script>
   </body>
