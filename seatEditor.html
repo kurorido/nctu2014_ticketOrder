@@ -52,8 +52,8 @@
       <h3>Color Prices Mapping</h3>
       <ul id="color-mapping-list" style="list-style: none">
         <li><div style="display: inline-block"><div class="color-label" style="background-color:#000;" onclick="changeType(0)"></div><span value="0" style="padding-left: 10px;"><span>Stage</span></span></div></li>
-        <li><div style="display: inline-block"><div class="color-label" style="background-color:#0f0;" onclick="changeType(1)"></div><span value="1" style="padding-left: 10px;"><span onclick="changeText(this)">Normal</span></span><span style="padding-left:10px"><span onclick="changePrice(this)">300</span></span></div></li>
-        <li><div style="display: inline-block"><div class="color-label" style="background-color:#00f;" onclick="changeType(2)"></div><span value="2" style="padding-left: 10px;"><span onclick="changeText(this)">VIP</span></span><span style="padding-left:10px"><span onclick="changePrice(this)">600</span></span></div></li>
+        <li><div style="display: inline-block"><div class="color-label" style="background-color:#0f0;" onclick="changeType(1)"></div><span value="1" style="padding-left: 10px;"><span onclick="changeText(this)">Normal</span></span><span value="1" style="padding-left:10px"><span onclick="changePrice(this)">300</span></span></div></li>
+        <li><div style="display: inline-block"><div class="color-label" style="background-color:#00f;" onclick="changeType(2)"></div><span value="2" style="padding-left: 10px;"><span onclick="changeText(this)">VIP</span></span><span value="2" style="padding-left:10px"><span onclick="changePrice(this)">600</span></span></div></li>
       </ul>
       <button onclick="addSeatType()">Add Seat Type</button>
       <button onclick="save()">Save</button>
@@ -126,12 +126,24 @@
       function save() {
         layer.setAttr('id', 'seatLayer');
         idLayer.setAttr('id', 'idLayer');
+
+        var restTickets = [];
+        layer.getChildren().forEach(function (rect) {
+            if(rect.getFill() != '#fff' && rect.getFill() != '#000') {
+              var _row = (parseInt(rect.getAttr('y')) / 30);
+              var _column = (parseInt(rect.getAttr('x')) / 30);
+              rowMap[_row] = true;
+              columnMap[_column] = true;
+            }
+        });
+        
         var eventRef = new Firebase("https://ticketorder.firebaseio.com/event/1");
         eventRef.set({
           seatMap: stage.toJSON(),
           colorList: modeColor,
           typeList: modeName,
-          priceList: modePrice
+          priceList: modePrice,
+          restTickets: restTickets
         });
       }
 
