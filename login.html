@@ -1,0 +1,50 @@
+<html>
+<head>
+  <script src="https://cdn.firebase.com/v0/firebase.js"></script>
+  <script src='https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js'></script>
+  <script type='text/javascript' src='https://cdn.firebase.com/js/simple-login/1.2.5/firebase-simple-login.js'></script>
+  <link rel="stylesheet" type="text/css" href="https://www.firebase.com/css/example.css">
+  <script src="./js/editorController.js"></script>
+</head>
+<body>
+  <div id="login_status">
+<button id="login_btn" onclick="login()">Login</button>
+</div>
+<div id="next" style="display:none">
+  <button onclick="viewEventList()">View Event List</button>
+  </div>
+
+<script>
+  function viewEventList() {
+    location.href = "viewEventList.html";
+  }
+
+function login() {
+
+
+  var activitiesRef = new Firebase('https://ticketorder.firebaseio.com/');
+  
+  var auth = new FirebaseSimpleLogin(activitiesRef, function(error, user) {
+    if (error) {
+      // an error occurred while attempting login
+      alert(error);
+    } else if (user) {
+      // user authenticated with Firebase
+      console.log('User ID: ' + user.id + ', Provider: ' + user.provider);
+    	console.log('Access Toekn: ' + user.accessToken);
+    	console.log('Display Name: ' + user.displayName);
+    	console.log(user.thirdPartyUserData);
+      $("#login_status").empty();
+      $("#login_status").append("<img src='https://graph.facebook.com/"+ user.id + "/picture' />");
+      $("#next").css("display", "block");
+      setCookie("userId", user.id, 30);
+    } else {
+      // user is logged out
+    }
+  });
+
+  auth.login('facebook');
+}
+</script>
+</body>
+</html>

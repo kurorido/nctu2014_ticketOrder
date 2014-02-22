@@ -1,0 +1,47 @@
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+  <meta charset="utf-8">
+  <script src="./js/jquery.min.js"></script>
+  <script src="./js/kinetic-v5.0.1.min.js"></script>
+  <script src="./js/firebase.js"></script>
+  <script src="./js/editorController.js"></script>
+  <style>
+  body {
+    margin: 0px;
+    padding: 0px;
+  }
+
+  </style>  
+</head>
+<body>
+  <div id="login_status">
+</div>
+
+  <ul id="event_list">
+
+  </ul>
+<script>
+
+       var eventsRef = new Firebase("https://ticketorder.firebaseio.com/event");
+        eventsRef.on('child_added', function(dataSnapshot) {
+          var events = dataSnapshot.val();
+          $("#event_list").append("<li><button onclick='javascript:setCookie(\"eventId\", "+ dataSnapshot.name() + ", 30);nextPage()'>" + events.title + "</button></li>");
+        });
+
+
+      var _currentUserId = getCookie('userId');
+      if(_currentUserId != "") {
+      $("#login_status").empty();
+      $("#login_status").append("<img src='https://graph.facebook.com/"+ _currentUserId + "/picture' />");
+
+
+      function nextPage() {
+        location.href = "simpleLoad.html";
+      }
+    }
+      
+</script>
+
+</body>
+</html>

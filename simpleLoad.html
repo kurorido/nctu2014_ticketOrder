@@ -10,6 +10,8 @@
   </head>
   <body>
     <div id="login_status"></div>
+    Your Rest Ticket<div id="rest_ticket"></div>
+    Your Ticket Type<div id="ticket_type"></div>
     <div id="container"></div>
           <h3>Color Prices Mapping</h3>
       <ul id="color-mapping-list" style="list-style: none">
@@ -19,6 +21,16 @@
     <script src="./js/jquery.min.js"></script>
     <script src="./js/editorController.js"></script>
     <script defer="defer">
+      var _eventId = getCookie("eventId");
+       var _ticketNum = getCookie('ticketNum');
+       var _ticketType = getCookie('ticketType');
+
+
+        var seatListRef = new Firebase("https://ticketorder.firebaseio.com/event/" + _eventId + "/seatList/");
+
+
+       $('#rest_ticket').html(_ticketNum);
+
 
       var _currentUserId = getCookie('userId');
       if(_currentUserId != "") {
@@ -26,7 +38,7 @@
         $("#login_status").append("<img src='https://graph.facebook.com/"+ _currentUserId + "/picture' />");      
       }
 
-      var _eventId = getCookie("eventId");
+
 
       var mode = 0;
       var seatTypeCount = 0;
@@ -65,31 +77,51 @@
 
         layer.getChildren().forEach(function (rect) {
           bindRectUserEvent(rect);
-        });          
+        });  
 
-        layer.on("mouseup", function(e) {
-          moving = false;
-        });        
 
+       $('#ticket_type').html(modeName[_ticketType]);
       });
 
 
       function bindRectUserEvent(rect) {
         rect.on('mousedown', function(e) {
-          if(this.getFill() != '#fff' && this.getFill() != '#000') {
-            if(this.getAttr('lockedBy') == _currentUserId) { // locked by current user, release it
-              return;
-            } else { // not locked by current user
-              if(this.getAttr('lockedBy') != '') { // not locked by any user
-              if(this.getFill() != '#f00') { // seat is available
-                this.setAttr('lockedBy', _currentUserId);
-                this.setAttr('available', false); // mark as not available
-                this.fill('#f00');
-                // update UI
+          if(_ticketNum > 0) {
+            if(this.getFill() != '#fff' && this.getFill() != '#000') { // don't click on white and black'
+              var x = rect.getAttr('x');
+              var y = rect.getAttr('y');
+              var imageObj = new Image();
+              imageObj.src = "https://graph.facebook.com/"+ _currentUserId + "/picture";
+              imageObj.onload = function() {
+              var img = new Kinetic.Image({
+                x: x,
+                y: y,
+                image: imageObj,
+                width: 30,
+                height: 30
+              });
+              layer.add(img);
+
+              img.on("mousedown", function(e) {
+                img.destroy();
+                _ticketNum++;
+                $('#rest_ticket').html(_ticketNum);
                 layer.draw();
-              }
+                seatListRef.child(rect.getAttr('id')).remove();
+              });
+                // update UI
+              layer.draw();
+              _ticketNum--;
+              $('#rest_ticket').html(_ticketNum);
+
+              seatListRef.child(rect.getAttr('id')).set({
+                userId: _currentUserId
+              });
             }
-          }
+            
+          } 
+        } else {
+          alert("you don't have enough ticket");
         }
 
       });

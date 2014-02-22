@@ -1,0 +1,66 @@
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+  <meta charset="utf-8">
+  <script src="./js/jquery.min.js"></script>
+  <script src="./js/kinetic-v5.0.1.min.js"></script>
+  <script src="./js/firebase.js"></script>
+  <script src="./js/editorController.js"></script>
+  <style>
+  body {
+    margin: 0px;
+    padding: 0px;
+  }
+
+  </style>  
+</head>
+<body>
+  <div id="login_status">
+</div>
+  <select id="type_select">
+
+  </select>
+  <input id="ticketNum" type="text" value="1"/>
+  <button onclick="nextPage()">Select Seat</button>
+<script>
+
+    var _eventId = getCookie("eventId");
+
+    function nextPage() {
+      setCookie("ticketType", $("#type_select").val(), 30);
+      setCookie("ticketNum", $("#ticketNum").val(), 30);
+      location.href = "simpleLoad.html";
+    }
+
+    console.log(_eventId);
+
+      var modeColor = [];
+      var modeName = [];
+      var modePrice = [];
+      var seatList = [];
+
+      var restTickets = [];
+
+       var eventsRef = new Firebase("https://ticketorder.firebaseio.com/event/" + _eventId);
+        eventsRef.on('value', function(dataSnapshot) {
+          var eventData = dataSnapshot.val();
+          modeName = eventData.typeList;
+          modeColor = eventData.colorList;
+          modePrice = eventData.priceList;
+          //restTickets = eventData.restTickets;
+          for(var i = 1; i < modeName.length; i++) {
+            $('#type_select').append("<option value="+ i+ ">"+ modeName[i] +"</option>");
+          }
+        });
+
+
+      var _currentUserId = getCookie('userId');
+      if(_currentUserId != "") {
+      $("#login_status").empty();
+      $("#login_status").append("<img src='https://graph.facebook.com/"+ _currentUserId + "/picture' />");
+    }
+      
+</script>
+
+</body>
+</html>
