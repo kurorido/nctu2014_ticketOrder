@@ -194,6 +194,7 @@
               var _column = (parseInt(rect.getAttr('x')) / 30);
               rowMap[_row] = true;
               columnMap[_column] = true;
+              rect.setAttr('id', rowNumToChar(_row)+_column);
             }
         });
         // draw character to row
