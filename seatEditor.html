@@ -52,8 +52,8 @@
       <h3>Color Prices Mapping</h3>
       <ul id="color-mapping-list" style="list-style: none">
         <li><div style="display: inline-block"><div class="color-label" style="background-color:#000;" onclick="changeType(0)"></div><span value="0" style="padding-left: 10px;"><span>Stage</span></span></div></li>
-        <li><div style="display: inline-block"><div class="color-label" style="background-color:#0f0;" onclick="changeType(1)"></div><span value="1" style="padding-left: 10px;"><span onclick="changeText(this)">Normal</span></span><span style="padding-left:10px"><span onclick="changePrice(this)">300</span></span></div></li>
-        <li><div style="display: inline-block"><div class="color-label" style="background-color:#00f;" onclick="changeType(2)"></div><span value="2" style="padding-left: 10px;"><span onclick="changeText(this)">VIP</span></span><span style="padding-left:10px"><span onclick="changePrice(this)">600</span></span></div></li>
+        <li><div style="display: inline-block"><div class="color-label" style="background-color:#0f0;" onclick="changeType(1)"></div><span value="1" style="padding-left: 10px;"><span onclick="changeText(this)">Normal</span></span><span value="1" style="padding-left:10px"><span onclick="changePrice(this)">300</span></span></div></li>
+        <li><div style="display: inline-block"><div class="color-label" style="background-color:#00f;" onclick="changeType(2)"></div><span value="2" style="padding-left: 10px;"><span onclick="changeText(this)">VIP</span></span><span value="2" style="padding-left:10px"><span onclick="changePrice(this)">600</span></span></div></li>
       </ul>
       <button onclick="addSeatType()">Add Seat Type</button>
       <button onclick="save()">Save</button>
@@ -88,7 +88,7 @@
       resetMap();
 
       function loadTemplate() {
-        var templateRef = new Firebase("https://ticketorder.firebaseio.com/template/2");
+        var templateRef = new Firebase("https://ticketorder.firebaseio.com/template/1");
         templateRef.once('value', function(dataSnapshot) {
           var templateData = dataSnapshot.val();
           json = templateData.seatMap;

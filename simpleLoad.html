@@ -20,16 +20,17 @@
 
       var mode = 0;
       var seatTypeCount = 0;
-      //var modeColor = ["#000","#f00","#0f0","#00f","#88f","#f8d","#f88","#f05","#f80","#0f8","#cf0","#08f","#408","#ff8","#8ff"];
-      var modeName = ["Stage", "Normal", "VIP"];
+      var modeColor = [];
+      var modeName = [];
+      var modePrice = [];
 
       var stage = null;
       var layer = new Kinetic.Layer();
       var idLayer = new Kinetic.Layer();
 
       var json = "";
-      var eventRef = new Firebase("https://ticketorder.firebaseio.com/event/1");
-        eventRef.once('value', function(dataSnapshot) {
+      var eventRef = new Firebase("https://ticketorder.firebaseio.com/template/1");
+      eventRef.once('value', function(dataSnapshot) {
         var eventData = dataSnapshot.val();
         json = eventData.seatMap;
         stage = Kinetic.Node.create(json, 'container');
@@ -42,6 +43,7 @@
 
         modeName = eventData.typeList;
         modeColor = eventData.colorList;
+        modePrice = eventData.priceList;
 
         $("#color-mapping-list").empty();
 
@@ -52,7 +54,7 @@
         }
 
         layer.getChildren().forEach(function (rect) {
-          bindRectEvent(rect);
+          bindRectUserEvent(rect);
         });          
 
         layer.on("mouseup", function(e) {
@@ -60,7 +62,29 @@
         });        
 
       });
+
+
+      function bindRectUserEvent(rect) {
+        rect.on('mousedown', function(e) {
+          moving = true;
+          if(this.getAttr('lockedBy') == _currentUserId) { // locked by current user, release it
+
+            return;
+          } else { // not locked by current user
+            if(this.getAttr('lockedBy') != '') { // not locked by any user
+              if(this.getAttr('available') == true) { // seat is available
+                this.setAttr('lockedBy', _currentUserId);
+                this.setAttr('available', false); // mark as not available
+                this.fill('#f00');
+                // update UI
+                layer.draw();
+              }
+            }
+          }
+        });
+      }        
       
     </script>
+    <script src="./js/editorController.js"></script>
   </body>
 </html>
