@@ -1,0 +1,33 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <style>
+      body {
+        margin: 0px;
+        padding: 0px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container"></div>
+    <script src="http://d3lp1msu2r81bx.cloudfront.net/kjs/js/lib/kinetic-v5.0.1.min.js"></script>
+    <script src="https://cdn.firebase.com/v0/firebase.js"></script>
+    <script defer="defer">
+
+      var stage = null;
+      var json = "";
+      var eventRef = new Firebase("https://ticketorder.firebaseio.com/event/1");
+      eventRef.once('value', function(dataSnapshot) {
+        var eventData = dataSnapshot.val();
+        json = eventData.seatMap;
+        stage = Kinetic.Node.create(json, 'container');
+
+        
+
+      });
+
+      // create node using json string
+      
+    </script>
+  </body>
+</html>
