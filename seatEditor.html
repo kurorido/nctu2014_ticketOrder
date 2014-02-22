@@ -1,0 +1,233 @@
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+  <meta charset="utf-8">
+  <script src="./js/jquery.min.js"></script>
+  <script src="./js/kinetic-v5.0.1.min.js"></script>
+  <style>
+  body {
+    margin: 0px;
+    padding: 0px;
+  }
+
+  .editor {
+    //width: 1000px;
+    margin: 0px auto;
+  }
+
+  .container {
+  }
+
+  #map_row, #map_column {
+    width: 30px;
+  }
+
+  .map {
+    padding: 30px;
+    float: left;
+  }
+
+  .color-label {
+    height:15px; width: 15px; display: inline-block; cursor: pointer;
+  }
+
+  </style>  
+</head>
+<body>
+
+  <div class="editor">
+    <div class="map">
+      <div class="editor-setting">
+        Row: <input id="map_row" type="text" value="10"/>
+        Column: <input id="map_column" type="text" value="10" />
+        <button type="button" onclick="resetMap()">New Map</button>
+        <button type="button" onclick="autoID()">Auto ID</button>
+      </div>
+      <div id="container"></div>
+    </div>
+    <div class="controller">
+      Current Ticket Type: 
+      <div><div id="currentType" class="color-label" style="background-color:#000;"></div>
+      <h3>Color Prices Mapping</h3>
+      <ul id="color-mapping-list" style="list-style: none">
+        <li><div style="display: inline-block"><div class="color-label" style="background-color:#000;" onclick="changeType(0)"></div><span style="padding-left: 10px;"><span onclick="changeText(this)">Normal</span></span></div></li>
+        <li><div style="display: inline-block"><div class="color-label" style="background-color:#f00;" onclick="changeType(1)"></div><span style="padding-left: 10px;"><span onclick="changeText(this)">VIP</span></span></div></li>
+      </ul>
+      <button onclick="addSeatType()">Add Seat Type</button>
+      <button onclick="clearLayer()">clear</button>
+    </div>
+  </div>
+<script>
+   
+      var mode = 0;
+      var row = 5;
+      var column = 5;
+      var pxUnit = 30;
+      var seatTypeCount = 2;
+
+      var modeColor = ["000","f00","0f0","00f","88f","f8d","f88","f05","f80","0f8","cf0","08f","408","ff8","8ff"];
+      var moving = false;
+
+      var stage = new Kinetic.Stage({
+          container: 'container'
+      });
+
+      var layer = new Kinetic.Layer();
+      var idLayer = new Kinetic.Layer();
+
+      stage.add(idLayer);
+      stage.add(layer);
+
+      resetMap();
+
+      function clearLayer() {
+        idLayer.clear();
+        idLayer = null;
+        idLayer = new Kinetic.Layer();
+        idLayer.draw();
+      }
+
+      function changeType(value) {
+        mode = value;
+        $("#currentType").css("background-color", modeColor[value]);
+      }
+
+      layer.on("mouseup", function(e) {
+        moving = false;
+      });
+
+      function autoID() {
+
+        idLayer.clear();
+        idLayer = null;
+        idLayer = new Kinetic.Layer();
+
+        var rowMap = new Array(row);
+        var columnMap = new Array(column);
+        layer.getChildren().forEach(function (rect) {
+            if(rect.getFill() != '#fff') {
+              var _row = (parseInt(rect.getAttr('y')) / 30);
+              var _column = (parseInt(rect.getAttr('x')) / 30);
+              rowMap[_row] = true;
+              columnMap[_column] = true;
+            }
+        });
+        // draw character to row
+        var _currentRow = 0;
+        for(var i = 0; i < rowMap.length; i++) {
+          if(rowMap[i] == true) {
+            var text = new Kinetic.Text({
+              x: pxUnit * (parseInt(column)) + pxUnit / 2,
+              y: i * pxUnit + pxUnit / 3,
+              text: rowNumToChar(_currentRow),
+              fontSize: 18,
+              fontFamily: 'Calibri',
+              fill: 'green'
+            });
+            idLayer.add(text);
+            _currentRow++;
+          }
+        }
+
+        // draw number to column
+        var _currentColumn = 0;
+        for(var i = 0; i < columnMap.length; i++) {
+          if(columnMap[i] == true) {
+            var text = new Kinetic.Text({
+              x: i * pxUnit + pxUnit / 3,
+              y: pxUnit * (parseInt(row)) + pxUnit / 2,
+              text: _currentColumn + 1,
+              fontSize: 18,
+              fontFamily: 'Calibri',
+              fill: 'green'
+            });
+            idLayer.add(text);
+            _currentColumn++;
+          }
+        }
+        idLayer.draw();
+        stage.add(idLayer);
+
+        arrayMap = null; // release memory
+      }
+
+      function rowNumToChar(row) {
+        return 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.charAt(row);
+      }
+
+      function resetMap() {
+        stage.clear();
+        layer.clear();
+
+        row = $("#map_row").val();
+        column = $("#map_column").val();
+
+        var actualWidth = pxUnit * (parseInt(column) + 1);
+        var actualHeight = pxUnit * (parseInt(row) + 1);
+
+        $("#container").width(actualWidth).height(actualHeight);
+
+        stage.setWidth(actualWidth);
+        stage.setHeight(actualHeight);
+
+        redrawSeats();
+        layer.draw();
+        stage.draw();
+
+      }
+
+      function redrawSeats() {
+        for(var i = 0; i < row; i++) {
+          for(var j = 0; j < column; j++) {
+            var rect = new Kinetic.Rect({
+              x: j * 30,
+              y: i * 30,
+              width: 30,
+              height: 30,
+              fill: '#fff',
+              stroke: 'black',
+              strokeWidth: 1
+            });
+            // add the shape to the layer
+            layer.add(rect);
+            rect.on('mousedown', function(e) {
+              moving = true;
+              if(this.getFill() != modeColor[mode]) {
+                this.fill(modeColor[mode]);
+                layer.draw();
+              } else if(this.getFill() == modeColor[mode]) {
+                this.fill('#fff');
+                layer.draw();
+              }
+            });
+
+            rect.on('mousemove', function(e) {
+              if(!moving) return;
+
+              if(this.getFill() != modeColor[mode]) {
+                this.fill(modeColor[mode]);
+                layer.draw();
+              }           
+            });
+          }
+        }
+      }
+
+      function addSeatType() {
+        $( "#color-mapping-list" ).append( "<li><div style=\"display: inline-block\" onclick=\"changeType("+ (seatTypeCount) + ")\"><div style=\"height:15px; width: 15px; background-color:" + modeColor[seatTypeCount] +"; display: inline-block\"></div><span style=\"padding-left: 10px;\"><span onclick=\"changeText(this)\">New Ticket Type</span></div></li>" );
+        seatTypeCount++;
+      }
+
+
+
+      function changeText(target) {
+        target.parentNode.innerHTML = "<input type='text' value='" + target.innerHTML  + "'/><button onclick='textOK(this.parentNode)'>OK</button>";
+      }
+
+      function textOK(target) {
+        target.innerHTML = "<span onclick=\"changeText(this)\">" + target.firstChild.value + "</span>";
+      }      
+      
+</script>
+</body>
+</html>
