@@ -87,7 +87,7 @@
       resetMap();
 
       function loadTemplate() {
-        var templateRef = new Firebase("https://ticketorder.firebaseio.com/template/1");
+        var templateRef = new Firebase("https://ticketorder.firebaseio.com/template/2");
         templateRef.once('value', function(dataSnapshot) {
           var templateData = dataSnapshot.val();
           json = templateData.seatMap;
