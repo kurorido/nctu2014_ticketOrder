@@ -9,6 +9,7 @@
     </style>
   </head>
   <body>
+    <div id="login_status"></div>
     <div id="container"></div>
           <h3>Color Prices Mapping</h3>
       <ul id="color-mapping-list" style="list-style: none">
@@ -16,7 +17,16 @@
     <script src="http://d3lp1msu2r81bx.cloudfront.net/kjs/js/lib/kinetic-v5.0.1.min.js"></script>
     <script src="https://cdn.firebase.com/v0/firebase.js"></script>
     <script src="./js/jquery.min.js"></script>
+    <script src="./js/editorController.js"></script>
     <script defer="defer">
+
+      var _currentUserId = getCookie('userId');
+      if(_currentUserId != "") {
+        $("#login_status").empty();
+        $("#login_status").append("<img src='https://graph.facebook.com/"+ _currentUserId + "/picture' />");      
+      }
+
+      var _eventId = getCookie("eventId");
 
       var mode = 0;
       var seatTypeCount = 0;
@@ -29,7 +39,7 @@
       var idLayer = new Kinetic.Layer();
 
       var json = "";
-      var eventRef = new Firebase("https://ticketorder.firebaseio.com/template/1");
+      var eventRef = new Firebase("https://ticketorder.firebaseio.com/event/" + _eventId);
       eventRef.once('value', function(dataSnapshot) {
         var eventData = dataSnapshot.val();
         json = eventData.seatMap;
@@ -66,13 +76,12 @@
 
       function bindRectUserEvent(rect) {
         rect.on('mousedown', function(e) {
-          moving = true;
-          if(this.getAttr('lockedBy') == _currentUserId) { // locked by current user, release it
-
-            return;
-          } else { // not locked by current user
-            if(this.getAttr('lockedBy') != '') { // not locked by any user
-              if(this.getAttr('available') == true) { // seat is available
+          if(this.getFill() != '#fff' && this.getFill() != '#000') {
+            if(this.getAttr('lockedBy') == _currentUserId) { // locked by current user, release it
+              return;
+            } else { // not locked by current user
+              if(this.getAttr('lockedBy') != '') { // not locked by any user
+              if(this.getFill() != '#f00') { // seat is available
                 this.setAttr('lockedBy', _currentUserId);
                 this.setAttr('available', false); // mark as not available
                 this.fill('#f00');
@@ -81,10 +90,14 @@
               }
             }
           }
-        });
-      }        
+        }
+
+      });
+      }
+
+    
       
     </script>
-    <script src="./js/editorController.js"></script>
+
   </body>
 </html>

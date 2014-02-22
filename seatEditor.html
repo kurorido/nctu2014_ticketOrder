@@ -126,12 +126,24 @@
       function save() {
         layer.setAttr('id', 'seatLayer');
         idLayer.setAttr('id', 'idLayer');
+
+        var restTickets = [];
+        layer.getChildren().forEach(function (rect) {
+            if(rect.getFill() != '#fff' && rect.getFill() != '#000') {
+              var _row = (parseInt(rect.getAttr('y')) / 30);
+              var _column = (parseInt(rect.getAttr('x')) / 30);
+              rowMap[_row] = true;
+              columnMap[_column] = true;
+            }
+        });
+        
         var eventRef = new Firebase("https://ticketorder.firebaseio.com/event/1");
         eventRef.set({
           seatMap: stage.toJSON(),
           colorList: modeColor,
           typeList: modeName,
-          priceList: modePrice
+          priceList: modePrice,
+          restTickets: restTickets
         });
       }
 
