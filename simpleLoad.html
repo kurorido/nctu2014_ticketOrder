@@ -21,7 +21,15 @@
     <script src="./js/jquery.min.js"></script>
     <script src="./js/editorController.js"></script>
     <script defer="defer">
-      var _eventId = getCookie("eventId");
+
+    var orderSerialNumber = "";
+    var imgRnd = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    for( var i=0; i < 10; i++ )
+        orderSerialNumber += possible.charAt(Math.floor(Math.random() * possible.length));
+
+       var _eventId = getCookie("eventId");
        var _ticketNum = getCookie('ticketNum');
        var _ticketType = getCookie('ticketType');
 
@@ -83,6 +91,47 @@
        $('#ticket_type').html(modeName[_ticketType]);
       });
 
+      seatListRef.on('child_added', function(dataSnapshot) {
+        var seatInfo = dataSnapshot.val();
+        var imageObj = new Image();
+        imageObj.src = "https://graph.facebook.com/"+ seatInfo.userId + "/picture";   
+        imageObj.onload = function() {
+          var val = dataSnapshot.name().split(",");
+          var img = new Kinetic.Image({
+            id: seatInfo.imgRnd,
+            x: parseInt(val[1]) * 30,
+            y: parseInt(val[0]) * 30,
+            image: imageObj,
+            width: 30,
+            height: 30
+          });
+           console.log("add " + seatInfo.imgRnd);
+          layer.add(img);
+
+          if(seatInfo.userId == _currentUserId && seatInfo.orderSerialNumber == orderSerialNumber) {
+            img.on("mousedown", function(e) {
+              // img.destroy();
+              _ticketNum++;
+              $('#rest_ticket').html(_ticketNum);
+              // layer.draw();
+              seatListRef.child(dataSnapshot.name()).remove();
+            });
+          }
+
+          layer.draw();
+
+        }
+        
+      });
+
+      seatListRef.on('child_removed', function(dataSnapshot) {
+        var seatInfo = dataSnapshot.val();
+        console.log("destroy " + seatInfo.imgRnd);
+        layer.find("#"+seatInfo.imgRnd)[0].destroy();
+        layer.draw();
+      });
+
+
 
       function bindRectUserEvent(rect) {
         rect.on('mousedown', function(e) {
@@ -90,42 +139,50 @@
             if(this.getFill() != '#fff' && this.getFill() != '#000') { // don't click on white and black'
               var x = rect.getAttr('x');
               var y = rect.getAttr('y');
-              var imageObj = new Image();
-              imageObj.src = "https://graph.facebook.com/"+ _currentUserId + "/picture";
-              imageObj.onload = function() {
-              var img = new Kinetic.Image({
-                x: x,
-                y: y,
-                image: imageObj,
-                width: 30,
-                height: 30
-              });
-              layer.add(img);
 
-              img.on("mousedown", function(e) {
-                img.destroy();
-                _ticketNum++;
-                $('#rest_ticket').html(_ticketNum);
-                layer.draw();
-                seatListRef.child(rect.getAttr('id')).remove();
-              });
+            // var imageObj = new Image();
+            // imageObj.src = "https://graph.facebook.com/"+ _currentUserId + "/picture";
+            // imageObj.onload = function() {
+            //   var img = new Kinetic.Image({
+            //     x: x,
+            //     y: y,
+            //     image: imageObj,
+            //     width: 30,
+            //     height: 30
+            //   });
+            //   layer.add(img);
+
+              // img.on("mousedown", function(e) {
+              //   img.destroy();
+              //   _ticketNum++;
+              //   $('#rest_ticket').html(_ticketNum);
+              //   layer.draw();
+              //   seatListRef.child(rect.getAttr('id')).remove();
+              // });
+
                 // update UI
-              layer.draw();
-              _ticketNum--;
-              $('#rest_ticket').html(_ticketNum);
+                // layer.draw();
+                _ticketNum--;
+                $('#rest_ticket').html(_ticketNum);
 
-              seatListRef.child(rect.getAttr('id')).set({
-                userId: _currentUserId
-              });
-            }
-            
-          } 
-        } else {
-          alert("you don't have enough ticket");
-        }
+                imgRnd = "";
+      for( var i=0; i < 10; i++ )
+        imgRnd += possible.charAt(Math.floor(Math.random() * possible.length));                
 
-      });
-      }
+                seatListRef.child(rect.getAttr('id')).set({
+                  userId: _currentUserId,
+                  orderSerialNumber: orderSerialNumber,
+                  imgRnd: imgRnd
+                });
+              // }
+
+            } 
+          } else {
+            alert("you don't have enough ticket");
+          }
+
+        });
+}
 
     
       
