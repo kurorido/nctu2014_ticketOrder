@@ -1,0 +1,36 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <script src="js/firebase.js"></script>
+  <script src="js/jquery.min.js"></script>
+  <script src="js/kinetic-v5.0.1.min.js"></script>
+  <script src="js/seat.js"></script>
+</head>
+<body>
+
+  <div id="container" style="display:none"></div>
+
+  <button id="btn_container" onclick="btn_container_click()" >check</button>
+  <button id="btn_back" onclick="btn_back_click()" style="display:none">back</button>
+
+  <script>
+  function btn_container_click()
+  {
+    document.getElementById("container").style.display="block";
+    containerShow();
+  }
+  function containerShow(){
+    document.getElementById("btn_container").style.display="none";
+    document.getElementById("btn_back").style.display="block";
+  }
+
+  function btn_back_click()
+  {
+    document.getElementById("container").style.display="none";
+    document.getElementById("btn_container").style.display="block";
+    document.getElementById("btn_back").style.display="none";
+  }
+  </script>
+
+</body>
+</html>
