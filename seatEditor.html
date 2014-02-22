@@ -54,7 +54,6 @@
         <li><div style="display: inline-block"><div class="color-label" style="background-color:#f00;" onclick="changeType(1)"></div><span style="padding-left: 10px;"><span onclick="changeText(this)">VIP</span></span></div></li>
       </ul>
       <button onclick="addSeatType()">Add Seat Type</button>
-      <button onclick="clearLayer()">clear</button>
     </div>
   </div>
 <script>
@@ -81,10 +80,17 @@
       resetMap();
 
       function clearLayer() {
-        idLayer.clear();
-        idLayer = null;
+        layer.destroy();
+        layer = new Kinetic.Layer();
+        stage.add(layer);
+
+        idLayer.destroy();
         idLayer = new Kinetic.Layer();
-        idLayer.draw();
+        stage.add(idLayer);
+
+        layer.on("mouseup", function(e) {
+          moving = false;
+        });
       }
 
       function changeType(value) {
@@ -92,9 +98,6 @@
         $("#currentType").css("background-color", modeColor[value]);
       }
 
-      layer.on("mouseup", function(e) {
-        moving = false;
-      });
 
       function autoID() {
 
@@ -156,8 +159,8 @@
       }
 
       function resetMap() {
-        stage.clear();
-        layer.clear();
+
+        clearLayer();
 
         row = $("#map_row").val();
         column = $("#map_column").val();
@@ -171,9 +174,8 @@
         stage.setHeight(actualHeight);
 
         redrawSeats();
-        layer.draw();
-        stage.draw();
 
+        stage.draw();
       }
 
       function redrawSeats() {
