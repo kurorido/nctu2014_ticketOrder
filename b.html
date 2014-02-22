@@ -8,29 +8,30 @@
 </head>
 <body>
 
-  <div id="container" style="display:none"></div>
+  <div id="smallcontainer" style="display:none"></div>
 
-  <button id="btn_container" onclick="btn_container_click()" >check</button>
+  <button id="btn_gotosmallcontainer" onclick="btn_container_click()">check</button>
   <button id="btn_back" onclick="btn_back_click()" style="display:none">back</button>
 
   <script>
   function btn_container_click()
   {
-    document.getElementById("container").style.display="block";
-    containerShow();
-  }
-  function containerShow(){
-    document.getElementById("btn_container").style.display="none";
+    document.getElementById("smallcontainer").style.display="block";
+    document.getElementById("btn_gotosmallcontainer").style.display="none";
     document.getElementById("btn_back").style.display="block";
+    document.getElementById("bigcontainer").style.display="none";
   }
 
   function btn_back_click()
   {
-    document.getElementById("container").style.display="none";
-    document.getElementById("btn_container").style.display="block";
+    document.getElementById("smallcontainer").style.display="none";
+    document.getElementById("btn_gotosmallcontainer").style.display="block";
     document.getElementById("btn_back").style.display="none";
+    document.getElementById("bigcontainer").style.display="block";
   }
   </script>
+
+  <div id="bigcontainer"></div>
 
 </body>
 </html>
