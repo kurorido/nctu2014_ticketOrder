@@ -60,39 +60,6 @@
         });        
 
       });
-
-      function bindRectEvent(rect) {
-        rect.on('mousedown', function(e) {
-          moving = true;
-          if(this.getAttr('lockedBy') == _currentUserId) { // locked by current user, release it
-
-            return;
-          } else { // not locked by current user
-            if(this.getAttr('lockedBy') != '') { // not locked by any user
-              if(this.getAttr('available') == true) { // seat is available
-                this.setAttr('lockedBy', _currentUserId);
-                this.setAttr('available', false); // mark as not available
-                this.fill('#f00');
-                // update UI
-                layer.draw();
-              }
-            }
-          }
-        });
-      }
-
-      function addSeatType(addFromTemplate) {
-
-        addFromTemplate = addFromTemplate || false;
-
-        if(!addFromTemplate) {
-          $( "#color-mapping-list" ).append( "<li><div style=\"display: inline-block\" onclick=\"changeType("+ (seatTypeCount) + ")\"><div style=\"height:15px; width: 15px; background-color:" + modeColor[seatTypeCount] +"; display: inline-block\"></div><span value="+ seatTypeCount +" style=\"padding-left: 10px;\"><span onclick=\"changeText(this)\">New Ticket Type</span></div></li>" );
-          modeName.push('New Ticket Type');
-        } else {
-           $( "#color-mapping-list" ).append( "<li><div style=\"display: inline-block\" onclick=\"changeType("+ (seatTypeCount) + ")\"><div style=\"height:15px; width: 15px; background-color:" + modeColor[seatTypeCount] +"; display: inline-block\"></div><span value="+ seatTypeCount +" style=\"padding-left: 10px;\"><span onclick=\"changeText(this)\">"+ modeName[seatTypeCount] + "</span></div></li>" );
-        }
-        seatTypeCount++;
-      }      
       
     </script>
   </body>

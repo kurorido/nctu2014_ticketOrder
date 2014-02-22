@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <script src="./js/jquery.min.js"></script>
   <script src="./js/kinetic-v5.0.1.min.js"></script>
-  <script src="https://cdn.firebase.com/v0/firebase.js"></script>
+  <script src="./js/firebase.js"></script>
   <style>
   body {
     margin: 0px;
@@ -53,7 +53,7 @@
       <ul id="color-mapping-list" style="list-style: none">
         <li><div style="display: inline-block"><div class="color-label" style="background-color:#000;" onclick="changeType(0)"></div><span value="0" style="padding-left: 10px;"><span>Stage</span></span></div></li>
         <li><div style="display: inline-block"><div class="color-label" style="background-color:#0f0;" onclick="changeType(1)"></div><span value="1" style="padding-left: 10px;"><span onclick="changeText(this)">Normal</span></span><span style="padding-left:10px"><span onclick="changePrice(this)">300</span></span></div></li>
-        <li><div style="display: inline-block"><div class="color-label" style="background-color:#00f;" onclick="changeType(2)"></div><span value="2" style="padding-left: 10px;"><span onclick="changeText(this)">VIP</span></span><span style="padding-left:10px"><span onclick="changePrice(this)">300</span></span></div></li>
+        <li><div style="display: inline-block"><div class="color-label" style="background-color:#00f;" onclick="changeType(2)"></div><span value="2" style="padding-left: 10px;"><span onclick="changeText(this)">VIP</span></span><span style="padding-left:10px"><span onclick="changePrice(this)">600</span></span></div></li>
       </ul>
       <button onclick="addSeatType()">Add Seat Type</button>
       <button onclick="save()">Save</button>
@@ -72,6 +72,7 @@
 
       var modeColor = ["#000","#0f0","#00f","#88f","#f8d","#f88","#f05","#f80","#0f8","#cf0","#08f","#408","#ff8","#8ff"];
       var modeName = ["Stage", "Normal", "VIP"];
+      var modePrice = [0, 300, 600];
       var moving = false;
 
       var stage = new Kinetic.Stage({
@@ -97,6 +98,7 @@
           layer = stage.find("#seatLayer")[0];
 
           modeName = templateData.typeList;
+          modePrice = templateData.priceList;
 
           $("#color-mapping-list").empty();
 
@@ -108,7 +110,7 @@
 
           layer.getChildren().forEach(function (rect) {
             bindRectEvent(rect);
-          });          
+          });
 
           layer.on("mouseup", function(e) {
             moving = false;
@@ -128,7 +130,8 @@
         eventRef.set({
           seatMap: stage.toJSON(),
           colorList: modeColor,
-          typeList: modeName
+          typeList: modeName,
+          priceList: modePrice
         });
       }
 
@@ -139,7 +142,8 @@
         eventRef.set({
           seatMap: stage.toJSON(),
           colorList: modeColor,
-          typeList: modeName
+          typeList: modeName,
+          priceList: modePrice
         });
       }      
 
@@ -285,41 +289,9 @@
         });
       }
 
-      function addSeatType(addFromTemplate) {
 
-        addFromTemplate = addFromTemplate || false;
-
-        if(!addFromTemplate) {
-          $( "#color-mapping-list" ).append( "<li><div style=\"display: inline-block\" onclick=\"changeType("+ (seatTypeCount) + ")\"><div style=\"height:15px; width: 15px; background-color:" + modeColor[seatTypeCount] +"; display: inline-block\"></div><span value="+ seatTypeCount +" style=\"padding-left: 10px;\"><span onclick=\"changeText(this)\">New Ticket Type</span></div></li>" );
-          modeName.push('New Ticket Type');
-        } else {
-           $( "#color-mapping-list" ).append( "<li><div style=\"display: inline-block\" onclick=\"changeType("+ (seatTypeCount) + ")\"><div style=\"height:15px; width: 15px; background-color:" + modeColor[seatTypeCount] +"; display: inline-block\"></div><span value="+ seatTypeCount +" style=\"padding-left: 10px;\"><span onclick=\"changeText(this)\">"+ modeName[seatTypeCount] + "</span></div></li>" );
-        }
-        seatTypeCount++;
-      }
-
-
-
-      function changeText(target) {
-        target.parentNode.innerHTML = "<input type='text' value='" + target.innerHTML  + "'/><button onclick='textOK(this.parentNode)'>OK</button>";
-      }
-
-      function changePrice(target) {
-        target.parentNode.innerHTML = "<input type='text' value='" + target.innerHTML  + "'/><button onclick='priceOK(this.parentNode)'>OK</button>";       
-      }
-
-      function textOK(target) {
-        var newValue = target.firstChild.value;
-        target.innerHTML = "<span onclick=\"changeText(this)\">" + newValue + "</span>";
-        modeName[target.getAttribute('value')] = newValue;
-      }
-
-      function priceOK(target) {
-        var newValue = target.firstChild.value;
-        target.innerHTML = "<span onclick=\"changePrice(this)\">" + newValue + "</span>";
-        //modeName[target.getAttribute('value')] = newValue;       
-      }
       
 </script>
+<script src="./js/editorController.js"></script>
 </body>
 </html>
