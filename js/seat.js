@@ -75,47 +75,47 @@ $(document).ready(function () {
     }
 
     var groupbig = new Kinetic.Group({
-      x: 100,
-      y: 0,
-      width: 100,
-      height: 100
+      x: 0,
+      y: 100,
+      width: 200,
+      height: 200
     });
       // store the original group center
       // so we can center the group there
-      groupbig.cx=groupbig.getX()+groupbig.getWidth()/2;
-      groupbig.cy=groupbig.getY()+groupbig.getHeight()/2;
+      // groupbig.cx=groupbig.getX()+groupbig.getWidth()/2;
+      // groupbig.cy=groupbig.getY()+groupbig.getHeight()/2;
       // custom scale function to both
       // scale the group and center the results
-      groupbig.scale=function(x,y){
-        groupbig.setScale(x,y);
-        groupbig.setPosition(
-          groupbig.cx - groupbig.getWidth() / 2 * groupbig.getScale().x,
-          groupbig.cy - groupbig.getHeight() / 2 * groupbig.getScale().y);
-        groupbig.draw();
-      }
-      var rect1_bigger = new Kinetic.Rect({
-        x: 20,
-        y: 0,
-        width: 32,
-        height: 32,
-        fill: 'yellow',
-        stroke: 'black',
-        strokeWidth: 4,
-        name: 'rect1_bigger'
-      });
-      groupbig.add(rect1_bigger);
+      // groupbig.scale=function(x,y){
+      //   groupbig.setScale(x,y);
+        // groupbig.setPosition(
+        //   groupbig.cx - groupbig.getWidth() / 2 * groupbig.getScale().x,
+        //   groupbig.cy - groupbig.getHeight() / 2 * groupbig.getScale().y);
+// groupbig.draw();
+// }
+var rect1_bigger = new Kinetic.Rect({
+  x: 20,
+  y: 0,
+  width: 32,
+  height: 32,
+  fill: 'yellow',
+  stroke: 'black',
+  strokeWidth: 4,
+  name: 'rect1_bigger'
+});
+groupbig.add(rect1_bigger);
 
-      for(var i=0;i<30;i++){
-        var rect1_big = new Kinetic.Rect({
-          x: 0+widthIndex*i,
-          y: 0+heightIndex*i,
-          width: 32,
-          height: 32,
-          fill: 'green',
-          stroke: 'black',
-          strokeWidth: 4,
-          name: 'rect1_big'
-        });
+for(var i=0;i<30;i++){
+  var rect1_big = new Kinetic.Rect({
+    x: 0+widthIndex*i,
+    y: 0+heightIndex*i,
+    width: 32,
+    height: 32,
+    fill: 'green',
+    stroke: 'black',
+    strokeWidth: 4,
+    name: 'rect1_big'
+  });
       // add the shape to the layer
       layer_big.add(rect1_big);
       
@@ -154,18 +154,17 @@ $(document).ready(function () {
         document.getElementById("btn_back").style.display="none";
         document.getElementById("bigcontainer").style.display="block";
         console.log("this is x"+magnifyingposition_x+" y"+magnifyingposition_y);
-        groupbig.scale(6,6);
+      });
+
+
+      var scaleFactor = 1;
+      $("#btn_check").click(function () {
+        rect1_bigger.scale({x:2,y:2});
+        rect1_bigger.draggable(true);
+        rect1_bigger.draw();
         console.log("ch");
       });
 
-
-       var scaleFactor = 1;
-      $("#btn_check").click(function () {
-          scaleFactor += 1.10;
-          groupbig.scale(scaleFactor, scaleFactor);
-          console.log(scaleFactor);
-      });
- 
     });
 
 
