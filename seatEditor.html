@@ -38,29 +38,34 @@
 
   <div class="editor">
     <div class="map">
+      <div class="controller">
+
+
+        <button onclick="addSeatType()">Add Seat Type</button>
+        <button onclick="save()">Save</button>
+        <button onclick="saveTemplate()">Save Template</button>
+        <button onclick="loadTemplate()">Load Template</button>
+        <button onclick="saveTemplate2()">Save Template 2</button>
+        <button onclick="loadTemplate2()">Load Template 2</button>
+        <button onclick="debug()">Debug</button>
+      </div>
       <div class="editor-setting">
         Row: <input id="map_row" type="text" value="10"/>
         Column: <input id="map_column" type="text" value="10" />
         <button type="button" onclick="resetMap()">New Map</button>
         <button type="button" onclick="autoID()">Auto ID</button>
       </div>
-      <div id="container"></div>
+      <div id="container"></div>    
     </div>
-    <div class="controller">
-      Current Ticket Type: 
-      <div><div id="currentType" class="color-label" style="background-color:#000;"></div>
+        <div style="display: inline-block; position:relative; top:10px">Current Ticket Type: 
+          <div id="currentType" class="color-label" style="background-color:#000;"></div>
+        </div>    
       <h3>Color Prices Mapping</h3>
       <ul id="color-mapping-list" style="list-style: none">
         <li><div style="display: inline-block"><div class="color-label" style="background-color:#000;" onclick="changeType(0)"></div><span value="0" style="padding-left: 10px;"><span>Stage</span></span></div></li>
         <li><div style="display: inline-block"><div class="color-label" style="background-color:#0f0;" onclick="changeType(1)"></div><span value="1" style="padding-left: 10px;"><span onclick="changeText(this)">Normal</span></span><span value="1" style="padding-left:10px"><span onclick="changePrice(this)">300</span></span></div></li>
         <li><div style="display: inline-block"><div class="color-label" style="background-color:#00f;" onclick="changeType(2)"></div><span value="2" style="padding-left: 10px;"><span onclick="changeText(this)">VIP</span></span><span value="2" style="padding-left:10px"><span onclick="changePrice(this)">600</span></span></div></li>
-      </ul>
-      <button onclick="addSeatType()">Add Seat Type</button>
-      <button onclick="save()">Save</button>
-      <button onclick="saveTemplate()">Save Template</button>
-      <button onclick="loadTemplate()">Load Template</button>
-      <button onclick="debug()">Debug</button>
-    </div>
+      </ul>      
   </div>
 <script>
    
@@ -86,6 +91,38 @@
       stage.add(layer);
 
       resetMap();
+
+      function loadTemplate2() {
+        var templateRef = new Firebase("https://ticketorder.firebaseio.com/template/2");
+        templateRef.once('value', function(dataSnapshot) {
+          var templateData = dataSnapshot.val();
+          json = templateData.seatMap;
+          stage = Kinetic.Node.create(json, 'container');
+
+          idLayer = stage.find("#idLayer")[0];
+          layer = stage.find("#seatLayer")[0];
+
+          modeName = templateData.typeList;
+          modePrice = templateData.priceList;
+
+          $("#color-mapping-list").empty();
+
+          seatTypeCount = 0;
+
+          for(var i = 0; i < modeName.length; i++) {
+            addSeatType(true);
+          }
+
+          layer.getChildren().forEach(function (rect) {
+            bindRectEvent(rect);
+          });
+
+          layer.on("mouseup", function(e) {
+            moving = false;
+          });
+
+        });        
+      }
 
       function loadTemplate() {
         var templateRef = new Firebase("https://ticketorder.firebaseio.com/template/1");
@@ -159,6 +196,17 @@
           priceList: modePrice
         });
       }      
+      function saveTemplate2() {
+        layer.setAttr('id', 'seatLayer');
+        idLayer.setAttr('id', 'idLayer');
+        var eventRef = new Firebase("https://ticketorder.firebaseio.com/template/2");
+        eventRef.set({
+          seatMap: stage.toJSON(),
+          colorList: modeColor,
+          typeList: modeName,
+          priceList: modePrice
+        });
+      }          
 
       function clearLayer() {
         layer.destroy();

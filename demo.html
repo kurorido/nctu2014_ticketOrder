@@ -1,0 +1,192 @@
+<!DOCTYPE>
+<html xmlns:fb="http://www.facebook.com/2008/fbml" xmlns:og="http://opengraphprotocol.org/schema/" >
+<head id="Head1"><title>
+	活動通 Accupass - 最好的活動報名系統及自助售票平台
+</title>
+<style>
+a {
+	text-decoration: none;
+}
+h2.banner {
+	font-size: 60px;
+	text-align: center;
+	color: #0088d2;
+	width: 570px;
+	margin: 0 auto 165px;
+	position: relative;
+	top: 120px;
+	z-index: 100;
+}
+
+h2.banner span {
+	font-size: 24px;
+	line-height: 36px;
+	color: #333;
+	margin: 25px 0 0;
+	display: block;
+}
+.NLCSS_banner {
+text-align: center;
+width: 100%;
+height: 500px;
+margin: 0 0 25px;
+position: relative;
+}
+.NLJS_findEvent {
+	background: #333;
+	font-size: 30px;
+	font-weight: bold;
+	line-height: 65px;
+	text-align: center;
+	color: #fff;
+	width: 285px;
+	height: 65px;
+	margin: 0 6px 0 10px;
+	display: inline-block;
+	vertical-align: top;
+	zoom: 1;
+	position: relative;
+	z-index: 100;
+	border-radius: 5px;
+}
+.NLJS_findLike {
+background: #333;
+font-size: 30px;
+font-weight: bold;
+line-height: 65px;
+text-align: center;
+color: #fff;
+width: 285px;
+height: 65px;
+margin: 0 6px 0 10px;
+display: inline-block;
+vertical-align: top;
+zoom: 1;
+position: relative;
+z-index: 100;
+border-radius: 5px;
+}
+
+.NLCSS_header {
+background-color: #111;
+width: 100%;
+height: 55px;
+position: fixed;
+left: 0;
+top: 0;
+z-index: 999;
+}
+
+.NLCSS_headerArea {
+width: 980px;
+height: 55px;
+margin: 0 auto;
+position: relative;
+z-index: 999;
+}
+
+h1.logo, h1.logo-white {
+background: url(logo.png) no-repeat 0 0 #0088d2;
+width: 145px;
+height: 55px;
+margin: 0 0 0 0;
+display: inline-block;
+vertical-align: top;
+zoom: 1;
+overflow: hidden;
+}
+
+.NLCSS_menu {
+font-size: 16px;
+line-height: 55px;
+color: #fff;
+height: 55px;
+margin: 0 -4px 0 30px;
+display: inline-block;
+vertical-align: top;
+zoom: 1;
+}
+
+.NLCSS_userBox {
+position: absolute;
+right: 0;
+top: 0;
+z-index: 999;
+}
+
+.NLCSS_userBox .userName {
+line-height: 55px;
+text-align: right;
+color: #fff;
+height: 55px;
+padding: 0 20px 0 0;
+cursor: pointer;
+}
+
+.NLCSS_userBox .userName a {
+line-height: 55px;
+height: 55px;
+color: #fff;
+margin: 0 -4px 0 20px;
+display: inline-block;
+vertical-align: top;
+zoom: 1;
+}
+</style>
+  <script src="https://cdn.firebase.com/v0/firebase.js"></script>
+  <script src='https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js'></script>
+  <script type='text/javascript' src='https://cdn.firebase.com/js/simple-login/1.2.5/firebase-simple-login.js'></script>
+  <script src="./js/editorController.js"></script>
+<script>
+function viewEventList() {
+	location.href = "viewEventList.html";
+}
+
+function login() {
+	var activitiesRef = new Firebase('https://ticketorder.firebaseio.com/');
+
+	var auth = new FirebaseSimpleLogin(activitiesRef, function(error, user) {
+		if (error) {
+      		// an error occurred while attempting login
+      		alert(error);
+	  	} else if (user) {
+	      // user authenticated with Firebase
+	      console.log('User ID: ' + user.id + ', Provider: ' + user.provider);
+	      console.log('Access Toekn: ' + user.accessToken);
+	      console.log('Display Name: ' + user.displayName);
+	      console.log(user.thirdPartyUserData);
+	      $("#login_status").empty();
+	      $("#login_status").append("<img src='https://graph.facebook.com/"+ user.id + "/picture' />");
+	      $(".NLCSS_menu").html("Welcome " + user.displayName);
+	      setCookie("userId", user.id, 30);
+		 } else {
+		    // user is logged out
+		 }
+	});
+
+	auth.login('facebook');
+}
+</script>
+</head>
+<body>
+<div class="NLCSS_header">
+    <div class="NLCSS_headerArea">
+        <h1 class="logo">
+            
+           
+        </h1>
+        <a class="NLCSS_menu" href="#" onclick="login()">Facebook 登入</a>
+    </div>
+</div>	
+	<div class="NLCSS_banner">
+		<div id="login_status" style="top:100px; position:relative">
+		</div>
+        <h2 class="banner">
+            讓生活 因活動而生動
+            <span>最貼心的線上活動報名平台<br>除了是辦活動的好夥伴、更是參加活動的好玩伴！</span>
+        </h2>
+        <a href="viewEventList.html" class="color_blue NLJS_findEvent">發現精彩活動</a>
+        <a href="seatEditor.html" class="color_green NLJS_findLike">舉辦你的活動</a>
+	</div>
+</body>
+</html>

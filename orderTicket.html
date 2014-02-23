@@ -15,11 +15,15 @@
   </style>  
 </head>
 <body>
+  <div id="currentStatus">
+
+  </div>
   <div id="login_status">
 </div>
-  <select id="type_select">
+  Ticket Type:<select id="type_select">
 
-  </select>
+  </select><br/>
+  Ticket Quantity:
   <input id="ticketNum" type="text" value="1"/>
   <button onclick="nextPage()">Select Seat</button>
 <script>
@@ -51,6 +55,8 @@
           for(var i = 1; i < modeName.length; i++) {
             $('#type_select').append("<option value="+ i+ ">"+ modeName[i] +"</option>");
           }
+
+          $("#currentStatus").html("You're going to join event " + eventData.title);
         });
 
 
