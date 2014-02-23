@@ -51,8 +51,8 @@ var seatTypeCount = 0;
     width: 160,
     height: 160,
     fill: '#ffffff',
-    stroke: 'black',
-    strokeWidth: 4,
+    stroke: 'red',
+    strokeWidth: 8,
     // draggable: true,
     opacity: 0.3,
     name: 'rect0'
@@ -232,6 +232,16 @@ function bindRectUserEvent(rect) {
 }
 
 $("#btn_gotobig").click(function(){
+  var layer_s = stage_big.getChildren()[0];
+      // console.log(stage_big.toJSON());
+      
+      layer_s.scale({x:2,y:2});
+      // console.log(layer_s.getPosition());
+      layer_s.position({x:-magnifyingposition_x,y:-magnifyingposition_y})
+      // console.log(layer_s.x);
+      layer_s.draggable(false);
+      layer_s.draw();
+      stage_big.draw();  
   document.getElementById("smallcontainer").style.display="none";
   document.getElementById("btn_gotosmall").style.display="block";
   document.getElementById("bigcontainer").style.display="block";
