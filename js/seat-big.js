@@ -136,7 +136,7 @@ var seatTypeCount = 0;
             width: 30,
             height: 30
           });
-           console.log("add " + seatInfo.imgRnd);
+          console.log("add " + seatInfo.imgRnd);
           layer.add(img);
 
           if(seatInfo.userId == _currentUserId && seatInfo.orderSerialNumber == orderSerialNumber) {
@@ -148,7 +148,6 @@ var seatTypeCount = 0;
               seatListRef.child(dataSnapshot.name()).remove();
             });
           }
-
           layer.draw();
 
         }
@@ -210,7 +209,7 @@ function bindRectUserEvent(rect) {
 
 $("#btn_gotobig").click(function(){
   var layer_s = stage_big.getChildren()[0];
-      // console.log(stage_big.toJSON());
+      console.log(stage_big.toJSON());
 
       layer_s.scale({x:stage_small.getAttr('width')/300,y:stage_small.getAttr('height')/300});
       // layer_s.scale({x:2,y:2});
