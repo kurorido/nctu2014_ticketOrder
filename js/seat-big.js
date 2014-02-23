@@ -28,8 +28,8 @@ if(_currentUserId != "") {
 var stage_big = null;
 var stage_small = new Kinetic.Stage({
   container: 'smallcontainer',
-  width: 400,
-  height: 400
+  width: 300,
+  height: 300
 });
 
 var mode = 0;
@@ -68,7 +68,7 @@ var seatTypeCount = 0;
   group.on('dragend',function(){
     magnifyingposition_x = group.getPosition().x;
     magnifyingposition_y = group.getPosition().y;
-    console.log("x"+magnifyingposition_x+" y"+magnifyingposition_y);
+    // console.log("x"+magnifyingposition_x+" y"+magnifyingposition_y);
   });
 
   var json = "";
@@ -78,11 +78,11 @@ var seatTypeCount = 0;
     json = eventData.seatMap;
     stage_big = Kinetic.Node.create(json, 'bigcontainer');
     stage_small = Kinetic.Node.create(json, 'smallcontainer');
-    console.log(stage_small.toJSON());
+    // console.log(stage_small.toJSON());
     stage_small.setScaleX(300/stage_small.getAttr('width'));
     stage_small.setScaleY(300/stage_small.getAttr('height'));
-    stage_small.setWidth(300);
-    stage_small.setHeight(300);
+    // stage_small.setWidth(300);
+    // stage_small.setHeight(300);
     // console.log(stage_small.getAttr(Width)+"?"+stage_small.getAttr(Height));
     stage_small.draw();
 
@@ -117,7 +117,6 @@ var seatTypeCount = 0;
     layer.getChildren().forEach(function (rect) {
       bindRectUserEvent(rect);
     });  
-
 
     $('#ticket_type').html(modeName[_ticketType]);  
 
@@ -187,40 +186,18 @@ function bindRectUserEvent(rect) {
               var x = rect.getAttr('x');
             var y = rect.getAttr('y');
 
-            // var imageObj = new Image();
-            // imageObj.src = "https://graph.facebook.com/"+ _currentUserId + "/picture";
-            // imageObj.onload = function() {
-            //   var img = new Kinetic.Image({
-            //     x: x,
-            //     y: y,
-            //     image: imageObj,
-            //     width: 30,
-            //     height: 30
-            //   });
-            //   layer.add(img);
+            _ticketNum--;
+            $('#rest_ticket').html(_ticketNum);
 
-              // img.on("mousedown", function(e) {
-              //   img.destroy();
-              //   _ticketNum++;
-              //   $('#rest_ticket').html(_ticketNum);
-              //   layer.draw();
-              //   seatListRef.child(rect.getAttr('id')).remove();
-              // });
+            imgRnd = "";
+            for( var i=0; i < 10; i++ )
+              imgRnd += possible.charAt(Math.floor(Math.random() * possible.length));                
 
-                // update UI
-                // layer.draw();
-                _ticketNum--;
-                $('#rest_ticket').html(_ticketNum);
-
-                imgRnd = "";
-                for( var i=0; i < 10; i++ )
-                  imgRnd += possible.charAt(Math.floor(Math.random() * possible.length));                
-
-                seatListRef.child(rect.getAttr('id')).set({
-                  userId: _currentUserId,
-                  orderSerialNumber: orderSerialNumber,
-                  imgRnd: imgRnd
-                });
+            seatListRef.child(rect.getAttr('id')).set({
+              userId: _currentUserId,
+              orderSerialNumber: orderSerialNumber,
+              imgRnd: imgRnd
+            });
               // }
 
             } 
@@ -234,38 +211,37 @@ function bindRectUserEvent(rect) {
 $("#btn_gotobig").click(function(){
   var layer_s = stage_big.getChildren()[0];
       // console.log(stage_big.toJSON());
-      
-      layer_s.scale({x:2,y:2});
+
+      layer_s.scale({x:stage_small.getAttr('width')/300,y:stage_small.getAttr('height')/300});
+      // layer_s.scale({x:2,y:2});
       // console.log(layer_s.getPosition());
-      layer_s.position({x:-magnifyingposition_x,y:-magnifyingposition_y})
+      layer_s.position({x:-magnifyingposition_x*(stage_small.getAttr('width')/300),y:-magnifyingposition_y*(stage_small.getAttr('height')/300)})
       // console.log(layer_s.x);
       layer_s.draggable(false);
       layer_s.draw();
       stage_big.draw();  
-  document.getElementById("smallcontainer").style.display="none";
-  document.getElementById("btn_gotosmall").style.display="block";
-  document.getElementById("bigcontainer").style.display="block";
-  document.getElementById("btn_gotobig").style.display="none";
-});
+      document.getElementById("smallcontainer").style.display="none";
+      document.getElementById("btn_gotosmall").style.display="block";
+      document.getElementById("bigcontainer").style.display="block";
+      document.getElementById("btn_gotobig").style.display="none";
+    });
 
 $("#btn_gotosmall").click(function(){
   document.getElementById("smallcontainer").style.display="block";
   document.getElementById("btn_gotosmall").style.display="none";
   document.getElementById("bigcontainer").style.display="none";
   document.getElementById("btn_gotobig").style.display="block";
-  console.log("this is x"+magnifyingposition_x+" y"+magnifyingposition_y);
 });
 
 function checkss() {
   var layer_s = stage_big.getChildren()[0];
       // console.log(stage_big.toJSON());
       
-      layer_s.scale({x:2,y:2});
+      layer_s.scale({x:stage_small.getAttr('width')/300,y:stage_small.getAttr('height')/300});
       // console.log(layer_s.getPosition());
       layer_s.position({x:-magnifyingposition_x,y:-magnifyingposition_y})
       // console.log(layer_s.x);
       layer_s.draggable(false);
       layer_s.draw();
-      stage_big.draw();
-      
+      stage_big.draw(); 
     }
