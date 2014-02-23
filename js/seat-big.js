@@ -81,8 +81,8 @@ var seatTypeCount = 0;
     console.log(stage_small.toJSON());
     stage_small.setScaleX(300/stage_small.getAttr('width'));
     stage_small.setScaleY(300/stage_small.getAttr('height'));
-    stage_small.setWidth(400);
-    stage_small.setHeight(400);
+    stage_small.setWidth(300);
+    stage_small.setHeight(300);
     // console.log(stage_small.getAttr(Width)+"?"+stage_small.getAttr(Height));
     stage_small.draw();
 
