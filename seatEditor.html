@@ -39,15 +39,15 @@
   <div class="editor">
     <div class="map">
       <div class="controller">
-
-
         <button onclick="addSeatType()">Add Seat Type</button>
         <button onclick="save()">Save</button>
         <button onclick="saveTemplate()">Save Template</button>
         <button onclick="loadTemplate()">Load Template</button>
         <button onclick="saveTemplate2()">Save Template 2</button>
         <button onclick="loadTemplate2()">Load Template 2</button>
+        <!--
         <button onclick="debug()">Debug</button>
+      -->
       </div>
       <div class="editor-setting">
         Row: <input id="map_row" type="text" value="10"/>
@@ -57,112 +57,112 @@
       </div>
       <div id="container"></div>    
     </div>
-        <div style="display: inline-block; position:relative; top:10px">Current Ticket Type: 
-          <div id="currentType" class="color-label" style="background-color:#000;"></div>
-        </div>    
-      <h3>Color Prices Mapping</h3>
-      <ul id="color-mapping-list" style="list-style: none">
-        <li><div style="display: inline-block"><div class="color-label" style="background-color:#000;" onclick="changeType(0)"></div><span value="0" style="padding-left: 10px;"><span>Stage</span></span></div></li>
-        <li><div style="display: inline-block"><div class="color-label" style="background-color:#0f0;" onclick="changeType(1)"></div><span value="1" style="padding-left: 10px;"><span onclick="changeText(this)">Normal</span></span><span value="1" style="padding-left:10px"><span onclick="changePrice(this)">300</span></span></div></li>
-        <li><div style="display: inline-block"><div class="color-label" style="background-color:#00f;" onclick="changeType(2)"></div><span value="2" style="padding-left: 10px;"><span onclick="changeText(this)">VIP</span></span><span value="2" style="padding-left:10px"><span onclick="changePrice(this)">600</span></span></div></li>
-      </ul>      
+    <div style="display: inline-block; position:relative; top:10px">Current Ticket Type: 
+      <div id="currentType" class="color-label" style="background-color:#000;"></div>
+    </div>    
+    <h3>Color Prices Mapping</h3>
+    <ul id="color-mapping-list" style="list-style: none">
+      <li><div style="display: inline-block"><div class="color-label" style="background-color:#000;" onclick="changeType(0)"></div><span value="0" style="padding-left: 10px;"><span>Stage</span></span></div></li>
+      <li><div style="display: inline-block"><div class="color-label" style="background-color:#0f0;" onclick="changeType(1)"></div><span value="1" style="padding-left: 10px;"><span onclick="changeText(this)">Normal</span></span><span value="1" style="padding-left:10px"><span onclick="changePrice(this)">300</span></span></div></li>
+      <li><div style="display: inline-block"><div class="color-label" style="background-color:#00f;" onclick="changeType(2)"></div><span value="2" style="padding-left: 10px;"><span onclick="changeText(this)">VIP</span></span><span value="2" style="padding-left:10px"><span onclick="changePrice(this)">600</span></span></div></li>
+    </ul>      
   </div>
-<script>
-   
-      var mode = 0;
-      var row = 5;
-      var column = 5;
-      var pxUnit = 30;
-      var seatTypeCount = 3;
+  <script>
 
-      var modeColor = ["#000","#0f0","#00f","#88f","#f8d","#f88","#f05","#f80","#0f8","#cf0","#08f","#408","#ff8","#8ff"];
-      var modeName = ["Stage", "Normal", "VIP"];
-      var modePrice = [0, 300, 600];
-      var moving = false;
+  var mode = 0;
+  var row = 5;
+  var column = 5;
+  var pxUnit = 30;
+  var seatTypeCount = 3;
 
-      var stage = new Kinetic.Stage({
-          container: 'container'
+  var modeColor = ["#000","#0f0","#00f","#88f","#f8d","#f88","#f05","#f80","#0f8","#cf0","#08f","#408","#ff8","#8ff"];
+  var modeName = ["Stage", "Normal", "VIP"];
+  var modePrice = [0, 300, 600];
+  var moving = false;
+
+  var stage = new Kinetic.Stage({
+    container: 'container'
+  });
+
+  var layer = new Kinetic.Layer();
+  var idLayer = new Kinetic.Layer();
+
+  stage.add(idLayer);
+  stage.add(layer);
+
+  resetMap();
+
+  function loadTemplate2() {
+    var templateRef = new Firebase("https://ticketorder.firebaseio.com/template/2");
+    templateRef.once('value', function(dataSnapshot) {
+      var templateData = dataSnapshot.val();
+      json = templateData.seatMap;
+      stage = Kinetic.Node.create(json, 'container');
+
+      idLayer = stage.find("#idLayer")[0];
+      layer = stage.find("#seatLayer")[0];
+
+      modeName = templateData.typeList;
+      modePrice = templateData.priceList;
+
+      $("#color-mapping-list").empty();
+
+      seatTypeCount = 0;
+
+      for(var i = 0; i < modeName.length; i++) {
+        addSeatType(true);
+      }
+
+      layer.getChildren().forEach(function (rect) {
+        bindRectEvent(rect);
       });
 
-      var layer = new Kinetic.Layer();
-      var idLayer = new Kinetic.Layer();
+      layer.on("mouseup", function(e) {
+        moving = false;
+      });
 
-      stage.add(idLayer);
-      stage.add(layer);
+    });        
+  }
 
-      resetMap();
+  function loadTemplate() {
+    var templateRef = new Firebase("https://ticketorder.firebaseio.com/template/1");
+    templateRef.once('value', function(dataSnapshot) {
+      var templateData = dataSnapshot.val();
+      json = templateData.seatMap;
+      stage = Kinetic.Node.create(json, 'container');
 
-      function loadTemplate2() {
-        var templateRef = new Firebase("https://ticketorder.firebaseio.com/template/2");
-        templateRef.once('value', function(dataSnapshot) {
-          var templateData = dataSnapshot.val();
-          json = templateData.seatMap;
-          stage = Kinetic.Node.create(json, 'container');
+      idLayer = stage.find("#idLayer")[0];
+      layer = stage.find("#seatLayer")[0];
 
-          idLayer = stage.find("#idLayer")[0];
-          layer = stage.find("#seatLayer")[0];
+      modeName = templateData.typeList;
+      modePrice = templateData.priceList;
 
-          modeName = templateData.typeList;
-          modePrice = templateData.priceList;
+      $("#color-mapping-list").empty();
 
-          $("#color-mapping-list").empty();
+      seatTypeCount = 0;
 
-          seatTypeCount = 0;
-
-          for(var i = 0; i < modeName.length; i++) {
-            addSeatType(true);
-          }
-
-          layer.getChildren().forEach(function (rect) {
-            bindRectEvent(rect);
-          });
-
-          layer.on("mouseup", function(e) {
-            moving = false;
-          });
-
-        });        
+      for(var i = 0; i < modeName.length; i++) {
+        addSeatType(true);
       }
 
-      function loadTemplate() {
-        var templateRef = new Firebase("https://ticketorder.firebaseio.com/template/1");
-        templateRef.once('value', function(dataSnapshot) {
-          var templateData = dataSnapshot.val();
-          json = templateData.seatMap;
-          stage = Kinetic.Node.create(json, 'container');
+      layer.getChildren().forEach(function (rect) {
+        bindRectEvent(rect);
+      });
 
-          idLayer = stage.find("#idLayer")[0];
-          layer = stage.find("#seatLayer")[0];
+      layer.on("mouseup", function(e) {
+        moving = false;
+      });
 
-          modeName = templateData.typeList;
-          modePrice = templateData.priceList;
+    });        
+  }
 
-          $("#color-mapping-list").empty();
+  function debug() {
+    console.log(modeName);
+  }
 
-          seatTypeCount = 0;
-
-          for(var i = 0; i < modeName.length; i++) {
-            addSeatType(true);
-          }
-
-          layer.getChildren().forEach(function (rect) {
-            bindRectEvent(rect);
-          });
-
-          layer.on("mouseup", function(e) {
-            moving = false;
-          });
-
-        });        
-      }
-
-      function debug() {
-        console.log(modeName);
-      }
-
-      function save() {
-        layer.setAttr('id', 'seatLayer');
-        idLayer.setAttr('id', 'idLayer');
+  function save() {
+    layer.setAttr('id', 'seatLayer');
+    idLayer.setAttr('id', 'idLayer');
         // var color
         // for(var i = 0; i < modeColor.length; i++) {
 
@@ -175,76 +175,76 @@
         //     }
         // });
 
-        var eventRef = new Firebase("https://ticketorder.firebaseio.com/event/1");
-        eventRef.set({
-          seatMap: stage.toJSON(),
-          colorList: modeColor,
-          typeList: modeName,
-          priceList: modePrice
+var eventRef = new Firebase("https://ticketorder.firebaseio.com/event/1");
+eventRef.set({
+  seatMap: stage.toJSON(),
+  colorList: modeColor,
+  typeList: modeName,
+  priceList: modePrice
           //restTickets: restTickets
         });
-      }
+}
 
-      function saveTemplate() {
-        layer.setAttr('id', 'seatLayer');
-        idLayer.setAttr('id', 'idLayer');
-        var eventRef = new Firebase("https://ticketorder.firebaseio.com/template/1");
-        eventRef.set({
-          seatMap: stage.toJSON(),
-          colorList: modeColor,
-          typeList: modeName,
-          priceList: modePrice
-        });
-      }      
-      function saveTemplate2() {
-        layer.setAttr('id', 'seatLayer');
-        idLayer.setAttr('id', 'idLayer');
-        var eventRef = new Firebase("https://ticketorder.firebaseio.com/template/2");
-        eventRef.set({
-          seatMap: stage.toJSON(),
-          colorList: modeColor,
-          typeList: modeName,
-          priceList: modePrice
-        });
-      }          
+function saveTemplate() {
+  layer.setAttr('id', 'seatLayer');
+  idLayer.setAttr('id', 'idLayer');
+  var eventRef = new Firebase("https://ticketorder.firebaseio.com/template/1");
+  eventRef.set({
+    seatMap: stage.toJSON(),
+    colorList: modeColor,
+    typeList: modeName,
+    priceList: modePrice
+  });
+}      
+function saveTemplate2() {
+  layer.setAttr('id', 'seatLayer');
+  idLayer.setAttr('id', 'idLayer');
+  var eventRef = new Firebase("https://ticketorder.firebaseio.com/template/2");
+  eventRef.set({
+    seatMap: stage.toJSON(),
+    colorList: modeColor,
+    typeList: modeName,
+    priceList: modePrice
+  });
+}          
 
-      function clearLayer() {
-        layer.destroy();
-        layer = new Kinetic.Layer();
-        stage.add(layer);
+function clearLayer() {
+  layer.destroy();
+  layer = new Kinetic.Layer();
+  stage.add(layer);
 
-        idLayer.destroy();
-        idLayer = new Kinetic.Layer();
-        stage.add(idLayer);
+  idLayer.destroy();
+  idLayer = new Kinetic.Layer();
+  stage.add(idLayer);
 
-        layer.on("mouseup", function(e) {
-          moving = false;
-        });
-      }
+  layer.on("mouseup", function(e) {
+    moving = false;
+  });
+}
 
-      function changeType(value) {
-        mode = value;
-        $("#currentType").css("background-color", modeColor[value]);
-      }
+function changeType(value) {
+  mode = value;
+  $("#currentType").css("background-color", modeColor[value]);
+}
 
 
-      function autoID() {
+function autoID() {
 
-        idLayer.clear();
-        idLayer = null;
-        idLayer = new Kinetic.Layer();
+  idLayer.clear();
+  idLayer = null;
+  idLayer = new Kinetic.Layer();
 
-        var rowMap = new Array(row);
-        var columnMap = new Array(column);
-        layer.getChildren().forEach(function (rect) {
-            if(rect.getFill() != '#fff' && rect.getFill() != '#000') {
-              var _row = (parseInt(rect.getAttr('y')) / 30);
-              var _column = (parseInt(rect.getAttr('x')) / 30);
-              rowMap[_row] = true;
-              columnMap[_column] = true;
-              rect.setAttr('id', _row+","+_column);
-            }
-        });
+  var rowMap = new Array(row);
+  var columnMap = new Array(column);
+  layer.getChildren().forEach(function (rect) {
+    if(rect.getFill() != '#fff' && rect.getFill() != '#000') {
+      var _row = (parseInt(rect.getAttr('y')) / 30);
+      var _column = (parseInt(rect.getAttr('x')) / 30);
+      rowMap[_row] = true;
+      columnMap[_column] = true;
+      rect.setAttr('id', _row+","+_column);
+    }
+  });
         // draw character to row
         var _currentRow = 0;
         for(var i = 0; i < rowMap.length; i++) {
@@ -353,7 +353,7 @@
 
 
       
-</script>
-<script src="./js/editorController.js"></script>
-</body>
-</html>
+      </script>
+      <script src="./js/editorController.js"></script>
+    </body>
+    </html>
