@@ -48,121 +48,121 @@
         <!--
         <button onclick="debug()">Debug</button>
       -->
-      </div>
-      <div class="editor-setting">
-        Row: <input id="map_row" type="text" value="10"/>
-        Column: <input id="map_column" type="text" value="10" />
-        <button type="button" onclick="resetMap()">New Map</button>
-        <button type="button" onclick="autoID()">Auto ID</button>
-      </div>
-      <div id="container"></div>    
     </div>
-    <div style="display: inline-block; position:relative; top:10px">Current Ticket Type: 
-      <div id="currentType" class="color-label" style="background-color:#000;"></div>
-    </div>    
-    <h3>Color Prices Mapping</h3>
-    <ul id="color-mapping-list" style="list-style: none">
-      <li><div style="display: inline-block"><div class="color-label" style="background-color:#000;" onclick="changeType(0)"></div><span value="0" style="padding-left: 10px;"><span>Stage</span></span></div></li>
-      <li><div style="display: inline-block"><div class="color-label" style="background-color:#0f0;" onclick="changeType(1)"></div><span value="1" style="padding-left: 10px;"><span onclick="changeText(this)">Normal</span></span><span value="1" style="padding-left:10px"><span onclick="changePrice(this)">300</span></span></div></li>
-      <li><div style="display: inline-block"><div class="color-label" style="background-color:#00f;" onclick="changeType(2)"></div><span value="2" style="padding-left: 10px;"><span onclick="changeText(this)">VIP</span></span><span value="2" style="padding-left:10px"><span onclick="changePrice(this)">600</span></span></div></li>
-    </ul>      
+    <div class="editor-setting">
+      Row: <input id="map_row" type="text" value="10"/>
+      Column: <input id="map_column" type="text" value="10" />
+      <button type="button" onclick="resetMap()">New Map</button>
+      <button type="button" onclick="autoID()">Auto ID</button>
+    </div>
+    <div id="container"></div>    
   </div>
-  <script>
+  <div style="display: inline-block; position:relative; top:10px">Current Ticket Type: 
+    <div id="currentType" class="color-label" style="background-color:#000;"></div>
+  </div>    
+  <h3>Color Prices Mapping</h3>
+  <ul id="color-mapping-list" style="list-style: none">
+    <li><div style="display: inline-block"><div class="color-label" style="background-color:#000;" onclick="changeType(0)"></div><span value="0" style="padding-left: 10px;"><span>Stage</span></span></div></li>
+    <li><div style="display: inline-block"><div class="color-label" style="background-color:#0f0;" onclick="changeType(1)"></div><span value="1" style="padding-left: 10px;"><span onclick="changeText(this)">Normal</span></span><span value="1" style="padding-left:10px"><span onclick="changePrice(this)">300</span></span></div></li>
+    <li><div style="display: inline-block"><div class="color-label" style="background-color:#00f;" onclick="changeType(2)"></div><span value="2" style="padding-left: 10px;"><span onclick="changeText(this)">VIP</span></span><span value="2" style="padding-left:10px"><span onclick="changePrice(this)">600</span></span></div></li>
+  </ul>      
+</div>
+<script>
 
-  var mode = 0;
-  var row = 5;
-  var column = 5;
-  var pxUnit = 30;
-  var seatTypeCount = 3;
+var mode = 0;
+var row = 5;
+var column = 5;
+var pxUnit = 30;
+var seatTypeCount = 3;
 
-  var modeColor = ["#000","#0f0","#00f","#88f","#f8d","#f88","#f05","#f80","#0f8","#cf0","#08f","#408","#ff8","#8ff"];
-  var modeName = ["Stage", "Normal", "VIP"];
-  var modePrice = [0, 300, 600];
-  var moving = false;
+var modeColor = ["#000","#0f0","#00f","#88f","#f8d","#f88","#f05","#f80","#0f8","#cf0","#08f","#408","#ff8","#8ff"];
+var modeName = ["Stage", "Normal", "VIP"];
+var modePrice = [0, 300, 600];
+var moving = false;
 
-  var stage = new Kinetic.Stage({
-    container: 'container'
-  });
+var stage = new Kinetic.Stage({
+  container: 'container'
+});
 
-  var layer = new Kinetic.Layer();
-  var idLayer = new Kinetic.Layer();
+var layer = new Kinetic.Layer();
+var idLayer = new Kinetic.Layer();
 
-  stage.add(idLayer);
-  stage.add(layer);
+stage.add(idLayer);
+stage.add(layer);
 
-  resetMap();
+resetMap();
 
-  function loadTemplate2() {
-    var templateRef = new Firebase("https://ticketorder.firebaseio.com/template/2");
-    templateRef.once('value', function(dataSnapshot) {
-      var templateData = dataSnapshot.val();
-      json = templateData.seatMap;
-      stage = Kinetic.Node.create(json, 'container');
+function loadTemplate2() {
+  var templateRef = new Firebase("https://ticketorder.firebaseio.com/template/2");
+  templateRef.once('value', function(dataSnapshot) {
+    var templateData = dataSnapshot.val();
+    json = templateData.seatMap;
+    stage = Kinetic.Node.create(json, 'container');
 
-      idLayer = stage.find("#idLayer")[0];
-      layer = stage.find("#seatLayer")[0];
+    idLayer = stage.find("#idLayer")[0];
+    layer = stage.find("#seatLayer")[0];
 
-      modeName = templateData.typeList;
-      modePrice = templateData.priceList;
+    modeName = templateData.typeList;
+    modePrice = templateData.priceList;
 
-      $("#color-mapping-list").empty();
+    $("#color-mapping-list").empty();
 
-      seatTypeCount = 0;
+    seatTypeCount = 0;
 
-      for(var i = 0; i < modeName.length; i++) {
-        addSeatType(true);
-      }
+    for(var i = 0; i < modeName.length; i++) {
+      addSeatType(true);
+    }
 
-      layer.getChildren().forEach(function (rect) {
-        bindRectEvent(rect);
-      });
+    layer.getChildren().forEach(function (rect) {
+      bindRectEvent(rect);
+    });
 
-      layer.on("mouseup", function(e) {
-        moving = false;
-      });
+    layer.on("mouseup", function(e) {
+      moving = false;
+    });
 
-    });        
-  }
+  });        
+}
 
-  function loadTemplate() {
-    var templateRef = new Firebase("https://ticketorder.firebaseio.com/template/1");
-    templateRef.once('value', function(dataSnapshot) {
-      var templateData = dataSnapshot.val();
-      json = templateData.seatMap;
-      stage = Kinetic.Node.create(json, 'container');
+function loadTemplate() {
+  var templateRef = new Firebase("https://ticketorder.firebaseio.com/template/1");
+  templateRef.once('value', function(dataSnapshot) {
+    var templateData = dataSnapshot.val();
+    json = templateData.seatMap;
+    stage = Kinetic.Node.create(json, 'container');
 
-      idLayer = stage.find("#idLayer")[0];
-      layer = stage.find("#seatLayer")[0];
+    idLayer = stage.find("#idLayer")[0];
+    layer = stage.find("#seatLayer")[0];
 
-      modeName = templateData.typeList;
-      modePrice = templateData.priceList;
+    modeName = templateData.typeList;
+    modePrice = templateData.priceList;
 
-      $("#color-mapping-list").empty();
+    $("#color-mapping-list").empty();
 
-      seatTypeCount = 0;
+    seatTypeCount = 0;
 
-      for(var i = 0; i < modeName.length; i++) {
-        addSeatType(true);
-      }
+    for(var i = 0; i < modeName.length; i++) {
+      addSeatType(true);
+    }
 
-      layer.getChildren().forEach(function (rect) {
-        bindRectEvent(rect);
-      });
+    layer.getChildren().forEach(function (rect) {
+      bindRectEvent(rect);
+    });
 
-      layer.on("mouseup", function(e) {
-        moving = false;
-      });
+    layer.on("mouseup", function(e) {
+      moving = false;
+    });
 
-    });        
-  }
+  });        
+}
 
-  function debug() {
-    console.log(modeName);
-  }
+function debug() {
+  console.log(modeName);
+}
 
-  function save() {
-    layer.setAttr('id', 'seatLayer');
-    idLayer.setAttr('id', 'idLayer');
+function save() {
+  layer.setAttr('id', 'seatLayer');
+  idLayer.setAttr('id', 'idLayer');
         // var color
         // for(var i = 0; i < modeColor.length; i++) {
 

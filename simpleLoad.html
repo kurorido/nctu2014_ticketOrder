@@ -1,147 +1,144 @@
 <!DOCTYPE HTML>
 <html>
-  <head>
-    <style>
-      body {
-        margin: 0px;
-        padding: 0px;
-      }
-      #container {
-        float: left;
-      }
-    </style>
-  </head>
-  <body>
-    <span id="login_status"></span>
-    Your Rest Ticket: <span style="padding-left: 10px" id="rest_ticket"></span>/
-    Your Ticket Type: <span style="padding-left: 10px" id="ticket_type"></span>
-    <div id="container"></div>
-          <h3>Color Prices Mapping</h3>
-      <ul id="color-mapping-list" style="list-style: none">
-      </ul>
-    <script src="http://d3lp1msu2r81bx.cloudfront.net/kjs/js/lib/kinetic-v5.0.1.min.js"></script>
-    <script src="https://cdn.firebase.com/v0/firebase.js"></script>
-    <script src="./js/jquery.min.js"></script>
-    <script src="./js/editorController.js"></script>
-    <script defer="defer">
+<head>
+  <style>
+  body {
+    margin: 0px;
+    padding: 0px;
+  }
+  #container {
+    float: left;
+  }
+  </style>
+</head>
+<body>
+  <span id="login_status"></span>
+  <button onclick="addSeatType()">Add Seat Type</button>
+  Your Rest Ticket: <span style="padding-left: 10px" id="rest_ticket"></span>/
+  Your Ticket Type: <span style="padding-left: 10px" id="ticket_type"></span>
+  <div id="container"></div>
+  <h3>Color Prices Mapping</h3>
+  <ul id="color-mapping-list" style="list-style: none">
+  </ul>
+  <script src="http://d3lp1msu2r81bx.cloudfront.net/kjs/js/lib/kinetic-v5.0.1.min.js"></script>
+  <script src="https://cdn.firebase.com/v0/firebase.js"></script>
+  <script src="./js/jquery.min.js"></script>
+  <script src="./js/editorController.js"></script>
+  <script defer="defer">
 
-    var orderSerialNumber = "";
-    var imgRnd = "";
-    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  var orderSerialNumber = "";
+  var imgRnd = "";
+  var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-    for( var i=0; i < 10; i++ )
-        orderSerialNumber += possible.charAt(Math.floor(Math.random() * possible.length));
+  for( var i=0; i < 10; i++ )
+    orderSerialNumber += possible.charAt(Math.floor(Math.random() * possible.length));
 
-       var _eventId = getCookie("eventId");
-       var _ticketNum = getCookie('ticketNum');
-       var _ticketType = getCookie('ticketType');
+  var _eventId = getCookie("eventId");
+  var _ticketNum = getCookie('ticketNum');
+  var _ticketType = getCookie('ticketType');
 
+  var seatListRef = new Firebase("https://ticketorder.firebaseio.com/event/" + _eventId + "/seatList/");
 
-        var seatListRef = new Firebase("https://ticketorder.firebaseio.com/event/" + _eventId + "/seatList/");
-
-
-       $('#rest_ticket').html(_ticketNum);
-
-
-      var _currentUserId = getCookie('userId');
-      if(_currentUserId != "") {
-        $("#login_status").empty();
-        $("#login_status").append("<img src='https://graph.facebook.com/"+ _currentUserId + "/picture' />");      
-      }
+  $('#rest_ticket').html(_ticketNum);
 
 
+  var _currentUserId = getCookie('userId');
+  if(_currentUserId != "") {
+    $("#login_status").empty();
+    $("#login_status").append("<img src='https://graph.facebook.com/"+ _currentUserId + "/picture' />");      
+  }
 
-      var mode = 0;
-      var seatTypeCount = 0;
-      var modeColor = [];
-      var modeName = [];
-      var modePrice = [];
+  var mode = 0;
+  var seatTypeCount = 0;
+  var modeColor = [];
+  var modeName = [];
+  var modePrice = [];
 
-      var stage = null;
-      var layer = new Kinetic.Layer();
-      var idLayer = new Kinetic.Layer();
+  var stage = null;
+  var layer = new Kinetic.Layer();
+  var idLayer = new Kinetic.Layer();
 
-      var json = "";
-      var eventRef = new Firebase("https://ticketorder.firebaseio.com/event/" + _eventId);
-      eventRef.once('value', function(dataSnapshot) {
-        var eventData = dataSnapshot.val();
-        json = eventData.seatMap;
-        stage = Kinetic.Node.create(json, 'container');
+  var json = "";
+  var eventRef = new Firebase("https://ticketorder.firebaseio.com/event/" + _eventId);
+  eventRef.once('value', function(dataSnapshot) {
+    var eventData = dataSnapshot.val();
+    json = eventData.seatMap;
+    stage = Kinetic.Node.create(json, 'container');
 
-        idLayer = stage.find("#idLayer")[0];
-        layer = stage.find("#seatLayer")[0];
+    idLayer = stage.find("#idLayer")[0];
+    layer = stage.find("#seatLayer")[0];
 
-        stage.add(idLayer);
-        stage.add(layer);
+    stage.add(idLayer);
+    stage.add(layer);
 
-        modeName = eventData.typeList;
-        modeColor = eventData.colorList;
-        modePrice = eventData.priceList;
+    modeName = eventData.typeList;
+    modeColor = eventData.colorList;
+    modePrice = eventData.priceList;
 
-        $("#color-mapping-list").empty();
+    $("#color-mapping-list").empty();
 
-        seatTypeCount = 0;
+    seatTypeCount = 0;
 
-        for(var i = 0; i < modeName.length; i++) {
-          addSeatType(true);
-        }
+    for(var i = 0; i < modeName.length; i++) {
+      addSeatType(true);
+    }
 
-        layer.getChildren().forEach(function (rect) {
-          bindRectUserEvent(rect);
-        });  
+    layer.getChildren().forEach(function (rect) {
+      bindRectUserEvent(rect);
+    });  
 
 
-       $('#ticket_type').html(modeName[_ticketType]);
+    $('#ticket_type').html(modeName[_ticketType]);
+  });
+
+  seatListRef.on('child_added', function(dataSnapshot) {
+    var seatInfo = dataSnapshot.val();
+    var imageObj = new Image();
+    imageObj.src = "https://graph.facebook.com/"+ seatInfo.userId + "/picture";   
+    imageObj.onload = function() {
+      var val = dataSnapshot.name().split(",");
+      var img = new Kinetic.Image({
+        id: seatInfo.imgRnd,
+        x: parseInt(val[1]) * 30,
+        y: parseInt(val[0]) * 30,
+        image: imageObj,
+        width: 30,
+        height: 30
       });
+      console.log("add " + seatInfo.imgRnd);
+      layer.add(img);
 
-      seatListRef.on('child_added', function(dataSnapshot) {
-        var seatInfo = dataSnapshot.val();
-        var imageObj = new Image();
-        imageObj.src = "https://graph.facebook.com/"+ seatInfo.userId + "/picture";   
-        imageObj.onload = function() {
-          var val = dataSnapshot.name().split(",");
-          var img = new Kinetic.Image({
-            id: seatInfo.imgRnd,
-            x: parseInt(val[1]) * 30,
-            y: parseInt(val[0]) * 30,
-            image: imageObj,
-            width: 30,
-            height: 30
-          });
-           console.log("add " + seatInfo.imgRnd);
-          layer.add(img);
-
-          if(seatInfo.userId == _currentUserId && seatInfo.orderSerialNumber == orderSerialNumber) {
-            img.on("mousedown", function(e) {
+      if(seatInfo.userId == _currentUserId && seatInfo.orderSerialNumber == orderSerialNumber) {
+        img.on("mousedown", function(e) {
               // img.destroy();
               _ticketNum++;
               $('#rest_ticket').html(_ticketNum);
               // layer.draw();
               seatListRef.child(dataSnapshot.name()).remove();
             });
-          }
+      }
 
-          layer.draw();
+      layer.draw();
 
-        }
-        
-      });
+    }
 
-      seatListRef.on('child_removed', function(dataSnapshot) {
-        var seatInfo = dataSnapshot.val();
-        console.log("destroy " + seatInfo.imgRnd);
-        layer.find("#"+seatInfo.imgRnd)[0].destroy();
-        layer.draw();
-      });
+  });
+
+  seatListRef.on('child_removed', function(dataSnapshot) {
+    var seatInfo = dataSnapshot.val();
+    console.log("destroy " + seatInfo.imgRnd);
+    layer.find("#"+seatInfo.imgRnd)[0].destroy();
+    layer.draw();
+  });
 
 
 
-      function bindRectUserEvent(rect) {
-        rect.on('mousedown', function(e) {
-          if(_ticketNum > 0) {
+  function bindRectUserEvent(rect) {
+    rect.on('mousedown', function(e) {
+      if(_ticketNum > 0) {
             if(this.getFill() != '#fff' && this.getFill() != '#000') { // don't click on white and black'
               var x = rect.getAttr('x');
-              var y = rect.getAttr('y');
+            var y = rect.getAttr('y');
 
             // var imageObj = new Image();
             // imageObj.src = "https://graph.facebook.com/"+ _currentUserId + "/picture";
@@ -169,8 +166,8 @@
                 $('#rest_ticket').html(_ticketNum);
 
                 imgRnd = "";
-      for( var i=0; i < 10; i++ )
-        imgRnd += possible.charAt(Math.floor(Math.random() * possible.length));                
+                for( var i=0; i < 10; i++ )
+                  imgRnd += possible.charAt(Math.floor(Math.random() * possible.length));                
 
                 seatListRef.child(rect.getAttr('id')).set({
                   userId: _currentUserId,
@@ -187,9 +184,9 @@
         });
 }
 
-    
-      
-    </script>
 
-  </body>
+
+</script>
+
+</body>
 </html>
